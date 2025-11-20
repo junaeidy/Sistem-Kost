@@ -44,6 +44,9 @@ $router->middleware('guest')->post('/register-owner', 'AuthController@registerOw
 // Logout
 $router->middleware('auth')->post('/logout', 'AuthController@logout');
 
+// Owner Pending Page (for pending owners)
+$router->middleware('auth')->get('/owner/pending', 'AuthController@showPending');
+
 // ================================================================
 // ADMIN ROUTES
 // ================================================================

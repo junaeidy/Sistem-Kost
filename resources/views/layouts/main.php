@@ -43,19 +43,19 @@
                             <a href="<?= url('/tenant/dashboard') ?>" class="text-gray-700 hover:text-blue-600">Dashboard</a>
                         <?php endif; ?>
                         
-                        <div class="relative group">
-                            <button class="flex items-center text-gray-700 hover:text-blue-600">
+                        <div class="relative" id="accountDropdown">
+                            <button onclick="toggleAccountMenu()" class="flex items-center text-gray-700 hover:text-blue-600">
                                 <i class="fas fa-user-circle mr-2"></i>
                                 Akun
                                 <i class="fas fa-chevron-down ml-1 text-xs"></i>
                             </button>
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden group-hover:block z-10">
-                                <a href="<?= url('/profile') ?>" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            <div id="accountMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden z-10 border border-gray-200">
+                                <a href="<?= url('/profile') ?>" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-md">
                                     <i class="fas fa-user mr-2"></i> Profil
                                 </a>
                                 <form action="<?= url('/logout') ?>" method="POST">
                                     <?= csrf_field() ?>
-                                    <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-md">
                                         <i class="fas fa-sign-out-alt mr-2"></i> Logout
                                     </button>
                                 </form>
@@ -158,6 +158,22 @@
             const menu = document.getElementById('mobileMenu');
             menu.classList.toggle('hidden');
         }
+        
+        // Account dropdown menu toggle
+        function toggleAccountMenu() {
+            const menu = document.getElementById('accountMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('accountDropdown');
+            const menu = document.getElementById('accountMenu');
+            
+            if (dropdown && menu && !dropdown.contains(event.target)) {
+                menu.classList.add('hidden');
+            }
+        });
         
         // Auto-hide flash messages after 5 seconds
         setTimeout(() => {

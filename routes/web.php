@@ -71,6 +71,11 @@ $router->middleware(['auth', 'admin'])->post('/admin/kost/{id}/delete', 'Admin\K
 $router->middleware(['auth', 'admin'])->get('/admin/transactions', 'Admin\TransactionController@index');
 $router->middleware(['auth', 'admin'])->get('/admin/transactions/{id}', 'Admin\TransactionController@show');
 
+// Profile Management
+$router->middleware(['auth', 'admin'])->get('/admin/profile', 'Admin\ProfileController@index');
+$router->middleware(['auth', 'admin'])->post('/admin/profile/update', 'Admin\ProfileController@updateProfile');
+$router->middleware(['auth', 'admin'])->post('/admin/profile/update-password', 'Admin\ProfileController@updatePassword');
+
 // ================================================================
 // OWNER ROUTES
 // ================================================================
@@ -80,7 +85,8 @@ $router->middleware(['auth', 'owner'])->get('/owner/dashboard', 'Owner\Dashboard
 // Kost Management
 $router->middleware(['auth', 'owner'])->get('/owner/kost', 'Owner\KostController@index');
 $router->middleware(['auth', 'owner'])->get('/owner/kost/create', 'Owner\KostController@create');
-$router->middleware(['auth', 'owner'])->post('/owner/kost', 'Owner\KostController@store');
+$router->middleware(['auth', 'owner'])->post('/owner/kost/store', 'Owner\KostController@store');
+$router->middleware(['auth', 'owner'])->get('/owner/kost/{id}', 'Owner\KostController@show');
 $router->middleware(['auth', 'owner'])->get('/owner/kost/{id}/edit', 'Owner\KostController@edit');
 $router->middleware(['auth', 'owner'])->post('/owner/kost/{id}/update', 'Owner\KostController@update');
 $router->middleware(['auth', 'owner'])->post('/owner/kost/{id}/delete', 'Owner\KostController@delete');
@@ -88,7 +94,7 @@ $router->middleware(['auth', 'owner'])->post('/owner/kost/{id}/delete', 'Owner\K
 // Kamar Management
 $router->middleware(['auth', 'owner'])->get('/owner/kost/{id}/kamar', 'Owner\KamarController@index');
 $router->middleware(['auth', 'owner'])->get('/owner/kost/{id}/kamar/create', 'Owner\KamarController@create');
-$router->middleware(['auth', 'owner'])->post('/owner/kamar', 'Owner\KamarController@store');
+$router->middleware(['auth', 'owner'])->post('/owner/kost/{id}/kamar/store', 'Owner\KamarController@store');
 $router->middleware(['auth', 'owner'])->get('/owner/kamar/{id}/edit', 'Owner\KamarController@edit');
 $router->middleware(['auth', 'owner'])->post('/owner/kamar/{id}/update', 'Owner\KamarController@update');
 $router->middleware(['auth', 'owner'])->post('/owner/kamar/{id}/delete', 'Owner\KamarController@delete');
@@ -98,6 +104,12 @@ $router->middleware(['auth', 'owner'])->get('/owner/bookings', 'Owner\BookingCon
 $router->middleware(['auth', 'owner'])->get('/owner/bookings/{id}', 'Owner\BookingController@show');
 $router->middleware(['auth', 'owner'])->post('/owner/bookings/{id}/accept', 'Owner\BookingController@accept');
 $router->middleware(['auth', 'owner'])->post('/owner/bookings/{id}/reject', 'Owner\BookingController@reject');
+
+// Profile Management
+$router->middleware(['auth', 'owner'])->get('/owner/profile', 'Owner\ProfileController@index');
+$router->middleware(['auth', 'owner'])->post('/owner/profile/update', 'Owner\ProfileController@updateProfile');
+$router->middleware(['auth', 'owner'])->post('/owner/profile/update-password', 'Owner\ProfileController@updatePassword');
+$router->middleware(['auth', 'owner'])->post('/owner/profile/delete-photo', 'Owner\ProfileController@deletePhoto');
 
 // ================================================================
 // TENANT ROUTES

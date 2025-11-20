@@ -28,6 +28,12 @@ $menuItems = [
         'label' => 'Transaksi',
         'active' => strpos($currentPath, '/admin/transactions') !== false
     ],
+    [
+        'url' => '/admin/profile',
+        'icon' => 'user-circle',
+        'label' => 'Profil Saya',
+        'active' => strpos($currentPath, '/admin/profile') !== false
+    ],
 ];
 ?>
 

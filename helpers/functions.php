@@ -538,3 +538,51 @@ function formatPaymentMethod($paymentType)
     
     return $methods[$type] ?? '<i class="fas fa-money-bill-wave text-gray-600"></i> ' . ucwords(str_replace('_', ' ', $paymentType));
 }
+
+/**
+ * Generate unique booking ID
+ * Format: TRX-XXXXXX (6 random alphanumeric characters)
+ * 
+ * @return string
+ */
+function generateBookingId()
+{
+    $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    $randomString = '';
+    
+    for ($i = 0; $i < 6; $i++) {
+        $randomString .= $characters[rand(0, strlen($characters) - 1)];
+    }
+    
+    return 'TRX-' . $randomString;
+}
+
+/**
+ * Check if booking ID is unique
+ * 
+ * @param string $bookingId
+ * @return bool
+ */
+function isBookingIdUnique($bookingId)
+{
+    $db = Core\Database::getInstance();
+    $query = "SELECT COUNT(*) as count FROM bookings WHERE booking_id = :booking_id";
+    $result = $db->fetchOne($query, ['booking_id' => $bookingId]);
+    
+    return $result['count'] == 0;
+}
+
+/**
+ * Generate unique booking ID with validation
+ * Ensures the generated ID is unique in database
+ * 
+ * @return string
+ */
+function generateUniqueBookingId()
+{
+    do {
+        $bookingId = generateBookingId();
+    } while (!isBookingIdUnique($bookingId));
+    
+    return $bookingId;
+}

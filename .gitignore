@@ -1,0 +1,68 @@
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Composer
+/vendor/
+composer.lock
+
+# Logs
+*.log
+logs/
+storage/logs/
+
+# Uploaded files (don't commit user uploads)
+public/uploads/kost/*
+public/uploads/ktp/*
+public/uploads/profile/*
+instruction/
+# Keep directory structure
+!public/uploads/kost/.gitkeep
+!public/uploads/ktp/.gitkeep
+!public/uploads/profile/.gitkeep
+
+# IDE specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# Cache
+storage/cache/*
+!storage/cache/.gitkeep
+storage/sessions/*
+!storage/sessions/.gitkeep
+
+# Node modules (if using Tailwind CLI)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build files
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Database backups
+*.sql.gz
+*.sql.backup
+database/backups/*
+!database/backups/.gitkeep

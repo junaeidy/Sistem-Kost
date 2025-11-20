@@ -1,0 +1,34 @@
+{
+    "name": "kost/sistem-informasi-kost",
+    "description": "Sistem Informasi Manajemen Kost dengan Fitur Pencarian & Pemesanan di Medan Sunggal",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "midtrans/midtrans-php": "^2.5",
+        "ezyang/htmlpurifier": "^4.16"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Core\\": "core/"
+        },
+        "files": [
+            "helpers/functions.php"
+        ]
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

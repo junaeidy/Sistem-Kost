@@ -493,3 +493,48 @@ function load_env()
         }
     }
 }
+
+/**
+ * Format payment method from Midtrans to user-friendly name
+ * 
+ * @param string|null $paymentType
+ * @return string
+ */
+function formatPaymentMethod($paymentType)
+{
+    if (empty($paymentType)) {
+        return '<span class="text-gray-500 italic">Belum dipilih</span>';
+    }
+    
+    $methods = [
+        // E-Wallet
+        'gopay' => '<i class="fab fa-google text-blue-500"></i> GoPay',
+        'shopeepay' => '<i class="fas fa-shopping-bag text-orange-500"></i> ShopeePay',
+        'qris' => '<i class="fas fa-qrcode text-purple-600"></i> QRIS',
+        
+        // Bank Transfer
+        'bank_transfer' => '<i class="fas fa-university text-blue-600"></i> Transfer Bank',
+        'bca_va' => '<i class="fas fa-university text-blue-700"></i> BCA Virtual Account',
+        'bni_va' => '<i class="fas fa-university text-orange-600"></i> BNI Virtual Account',
+        'bri_va' => '<i class="fas fa-university text-blue-500"></i> BRI Virtual Account',
+        'mandiri_va' => '<i class="fas fa-university text-yellow-600"></i> Mandiri Virtual Account',
+        'permata_va' => '<i class="fas fa-university text-green-600"></i> Permata Virtual Account',
+        'other_va' => '<i class="fas fa-university text-gray-600"></i> Virtual Account',
+        
+        // Credit/Debit Card
+        'credit_card' => '<i class="fas fa-credit-card text-indigo-600"></i> Kartu Kredit/Debit',
+        
+        // Convenience Store
+        'cstore' => '<i class="fas fa-store text-green-600"></i> Convenience Store',
+        'indomaret' => '<i class="fas fa-store text-blue-600"></i> Indomaret',
+        'alfamart' => '<i class="fas fa-store text-red-600"></i> Alfamart',
+        
+        // Others
+        'akulaku' => '<i class="fas fa-wallet text-purple-600"></i> Akulaku',
+        'kredivo' => '<i class="fas fa-wallet text-blue-600"></i> Kredivo',
+    ];
+    
+    $type = strtolower($paymentType);
+    
+    return $methods[$type] ?? '<i class="fas fa-money-bill-wave text-gray-600"></i> ' . ucwords(str_replace('_', ' ', $paymentType));
+}

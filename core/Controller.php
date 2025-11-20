@@ -32,6 +32,24 @@ abstract class Controller
             $layoutFile = dirname(__DIR__) . '/resources/views/' . ($layout ?? 'layouts/main') . '.php';
             
             if (file_exists($layoutFile)) {
+                // Load sidebar menu if dashboard layout
+                if ($layout === 'layouts/dashboard' || $layout === 'dashboard') {
+                    $sidebarFile = null;
+                    if (is_admin()) {
+                        $sidebarFile = dirname(__DIR__) . '/resources/views/admin/_sidebar.php';
+                    } elseif (is_owner()) {
+                        $sidebarFile = dirname(__DIR__) . '/resources/views/owner/_sidebar.php';
+                    } elseif (is_tenant()) {
+                        $sidebarFile = dirname(__DIR__) . '/resources/views/tenant/_sidebar.php';
+                    }
+                    
+                    if ($sidebarFile && file_exists($sidebarFile)) {
+                        ob_start();
+                        require $sidebarFile;
+                        $sidebarMenu = ob_get_clean();
+                    }
+                }
+                
                 // Start output buffering for content
                 ob_start();
                 require $viewFile;

@@ -205,6 +205,9 @@ class Router
      */
     private function executeHandler($handler, $params = [])
     {
+        // Ensure params is indexed array (not associative)
+        $params = array_values($params);
+        
         if (is_callable($handler)) {
             call_user_func_array($handler, $params);
         } elseif (is_string($handler)) {

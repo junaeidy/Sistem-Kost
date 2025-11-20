@@ -1,0 +1,204 @@
+<?php 
+$pageTitle = $pageTitle ?? 'Detail Kost';
+$kost = $kost ?? [];
+$photos = $photos ?? [];
+$kamars = $kamars ?? [];
+?>
+
+<!-- Kost Info Card -->
+<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="flex items-start justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2"><?= e($kost['name']) ?></h2>
+            <div class="space-y-2">
+                <p class="text-gray-600">
+                    <i class="fas fa-map-marker-alt mr-2 text-red-500"></i><?= e($kost['location']) ?>
+                </p>
+                <p class="text-gray-600">
+                    <i class="fas fa-home mr-2 text-blue-500"></i><?= e($kost['address']) ?>
+                </p>
+                <p class="text-gray-600">
+                    <i class="fas fa-user-tie mr-2 text-green-500"></i>
+                    Owner: <strong><?= e($kost['owner_name']) ?></strong> (<?= e($kost['owner_email']) ?>)
+                </p>
+                <p class="text-gray-600">
+                    <i class="fas fa-phone mr-2 text-purple-500"></i><?= e($kost['owner_phone']) ?>
+                </p>
+            </div>
+        </div>
+        
+        <div class="text-right">
+            <p class="text-3xl font-bold text-blue-600 mb-2">
+                Rp <?= number_format($kost['price'], 0, ',', '.') ?>
+            </p>
+            <p class="text-sm text-gray-500 mb-3">per bulan</p>
+            <span class="px-4 py-2 text-sm font-medium rounded-full
+                <?= $kost['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' ?>">
+                <?= ucfirst($kost['status']) ?>
+            </span>
+        </div>
+    </div>
+
+    <!-- Kost Details -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+        <div class="text-center">
+            <i class="fas fa-venus-mars text-2xl text-purple-600 mb-2"></i>
+            <p class="text-sm text-gray-600">Tipe</p>
+            <p class="font-semibold text-gray-800">
+                <?= $kost['gender_type'] === 'male' ? 'Putra' : ($kost['gender_type'] === 'female' ? 'Putri' : 'Campur') ?>
+            </p>
+        </div>
+        <div class="text-center">
+            <i class="fas fa-door-open text-2xl text-blue-600 mb-2"></i>
+            <p class="text-sm text-gray-600">Total Kamar</p>
+            <p class="font-semibold text-gray-800"><?= count($kamars) ?> kamar</p>
+        </div>
+        <div class="text-center">
+            <i class="fas fa-check-circle text-2xl text-green-600 mb-2"></i>
+            <p class="text-sm text-gray-600">Kamar Tersedia</p>
+            <p class="font-semibold text-gray-800">
+                <?= count(array_filter($kamars, fn($k) => $k['status'] === 'available')) ?> kamar
+            </p>
+        </div>
+    </div>
+
+    <!-- Facilities -->
+    <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">
+            <i class="fas fa-star text-yellow-500 mr-2"></i>Fasilitas
+        </h3>
+        <div class="flex flex-wrap gap-2">
+            <?php 
+            $facilities = explode(',', $kost['facilities'] ?? '');
+            foreach ($facilities as $facility): 
+                $facility = trim($facility);
+                if (!empty($facility)):
+            ?>
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                    <i class="fas fa-check mr-1"></i><?= e($facility) ?>
+                </span>
+            <?php 
+                endif;
+            endforeach; 
+            ?>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">
+            <i class="fas fa-align-left mr-2"></i>Deskripsi
+        </h3>
+        <div class="prose max-w-none text-gray-700">
+            <?php if (!empty($kost['description'])): ?>
+                <?= $kost['description'] ?>
+            <?php else: ?>
+                <p class="text-gray-500 italic">Tidak ada deskripsi</p>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Photos -->
+    <?php if (!empty($photos)): ?>
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                <i class="fas fa-images mr-2"></i>Foto Kost
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <?php foreach ($photos as $photo): ?>
+                    <div class="relative group">
+                        <?php if (!empty($photo['photo_url'])): ?>
+                            <img src="<?= asset($photo['photo_url']) ?>" 
+                                 alt="Kost Photo" 
+                                 class="w-full h-40 object-cover rounded-lg cursor-pointer"
+                                 onclick="window.open(this.src, '_blank')">
+                        <?php else: ?>
+                            <div class="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400 text-3xl"></i>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($photo['is_primary']): ?>
+                            <span class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-white text-xs rounded-full">
+                                <i class="fas fa-star"></i> Primary
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <!-- Action Buttons -->
+    <div class="border-t border-gray-200 pt-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Aksi</h3>
+        <div class="flex flex-wrap gap-3">
+            
+            <!-- Update Status -->
+            <form action="<?= url('/admin/kost/' . $kost['id'] . '/status') ?>" method="POST" class="inline">
+                <?= csrf_field() ?>
+                <select name="status" onchange="if(confirm('Ubah status kost?')) this.form.submit()" 
+                        class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="active" <?= $kost['status'] === 'active' ? 'selected' : '' ?>>Active</option>
+                    <option value="inactive" <?= $kost['status'] === 'inactive' ? 'selected' : '' ?>>Inactive</option>
+                </select>
+            </form>
+            
+            <!-- Delete Button -->
+            <form action="<?= url('/admin/kost/' . $kost['id'] . '/delete') ?>" method="POST" 
+                  onsubmit="return confirm('Yakin ingin menghapus kost ini? Data tidak dapat dikembalikan!')" class="inline">
+                <?= csrf_field() ?>
+                <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    <i class="fas fa-trash mr-2"></i>Hapus Kost
+                </button>
+            </form>
+            
+            <a href="<?= url('/admin/kost') ?>" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+                <i class="fas fa-arrow-left mr-2"></i>Kembali
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Kamar List -->
+<div class="bg-white rounded-lg shadow-md p-6">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+        <i class="fas fa-door-open mr-2"></i>Daftar Kamar (<?= count($kamars) ?>)
+    </h3>
+    
+    <?php if (empty($kamars)): ?>
+        <p class="text-gray-500 text-center py-8">Belum ada kamar</p>
+    <?php else: ?>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <?php foreach ($kamars as $kamar): ?>
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <h4 class="font-semibold text-gray-800"><?= e($kamar['name']) ?></h4>
+                            <p class="text-sm text-gray-600">Lantai <?= e($kamar['floor'] ?? '-') ?></p>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded-full
+                            <?= $kamar['status'] === 'available' ? 'bg-green-100 text-green-800' : 
+                                ($kamar['status'] === 'occupied' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') ?>">
+                            <?= ucfirst($kamar['status']) ?>
+                        </span>
+                    </div>
+                    <p class="text-lg font-bold text-blue-600 mb-2">
+                        <?php if ($kamar['price'] > 0): ?>
+                            Rp <?= number_format($kamar['price'], 0, ',', '.') ?>/bln
+                        <?php else: ?>
+                            Sama dengan kost
+                        <?php endif; ?>
+                    </p>
+                    <div class="text-sm text-gray-600">
+                        <p><i class="fas fa-ruler-combined mr-1"></i> <?= e($kamar['size'] ?? '-') ?> m²</p>
+                        <?php if (!empty($kamar['facilities'])): ?>
+                            <p class="mt-1 text-xs">
+                                <?= e(substr($kamar['facilities'], 0, 50)) ?><?= strlen($kamar['facilities']) > 50 ? '...' : '' ?>
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>

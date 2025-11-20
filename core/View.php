@@ -87,7 +87,7 @@ class View
     {
         $appConfig = require dirname(__DIR__) . '/config/app.php';
         $baseUrl = rtrim($appConfig['url'], '/');
-        $path = ltrim($path, '/');
+        $path = ltrim($path ?? '', '/');
         return $baseUrl . '/' . $path;
     }
 }

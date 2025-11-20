@@ -61,29 +61,40 @@ class OwnerModel extends Model
     /**
      * Get all owners with user details
      * 
-     * @param string|null $status
+     * @param array|string|null $filter Status filter (can be string or array with 'status' key)
+     * @param int|null $limit Limit results
      * @return array
      */
-    public function getAllWithUsers($status = null)
+    public function getAllWithUsers($filter = null, $limit = null)
     {
         $query = "
             SELECT 
                 o.*,
                 u.email,
-                u.status as user_status,
-                u.created_at as registered_at
+                u.status,
+                u.created_at
             FROM owners o
             JOIN users u ON o.user_id = u.id
         ";
 
         $params = [];
 
-        if ($status) {
-            $query .= " WHERE u.status = :status";
-            $params['status'] = $status;
+        // Handle filter (can be string or array)
+        if ($filter) {
+            if (is_array($filter) && isset($filter['status'])) {
+                $query .= " WHERE u.status = :status";
+                $params['status'] = $filter['status'];
+            } elseif (is_string($filter)) {
+                $query .= " WHERE u.status = :status";
+                $params['status'] = $filter;
+            }
         }
 
         $query .= " ORDER BY u.created_at DESC";
+
+        if ($limit) {
+            $query .= " LIMIT " . intval($limit);
+        }
 
         return $this->fetchAll($query, $params);
     }

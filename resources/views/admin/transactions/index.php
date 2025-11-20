@@ -1,0 +1,128 @@
+<?php 
+$pageTitle = $pageTitle ?? 'Kelola Transaksi';
+$transactions = $transactions ?? [];
+$currentStatus = $currentStatus ?? 'all';
+$stats = $stats ?? [];
+?>
+
+<!-- Statistics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-lg shadow-md p-4">
+        <p class="text-gray-500 text-sm">Total Transaksi</p>
+        <p class="text-2xl font-bold text-gray-800"><?= $stats['total'] ?? 0 ?></p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-4">
+        <p class="text-gray-500 text-sm">Pending</p>
+        <p class="text-2xl font-bold text-yellow-600"><?= $stats['pending'] ?? 0 ?></p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-4">
+        <p class="text-gray-500 text-sm">Success</p>
+        <p class="text-2xl font-bold text-green-600"><?= $stats['success'] ?? 0 ?></p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-4">
+        <p class="text-gray-500 text-sm">Total Revenue</p>
+        <p class="text-2xl font-bold text-blue-600">Rp <?= number_format($stats['total_revenue'] ?? 0, 0, ',', '.') ?></p>
+    </div>
+</div>
+
+<!-- Filter -->
+<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="flex flex-wrap items-center gap-3">
+        <span class="text-gray-700 font-medium">Filter Status:</span>
+        <a href="<?= url('/admin/transactions?status=all') ?>" 
+           class="px-4 py-2 rounded-lg <?= $currentStatus === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?>">
+            Semua
+        </a>
+        <a href="<?= url('/admin/transactions?status=pending') ?>" 
+           class="px-4 py-2 rounded-lg <?= $currentStatus === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?>">
+            Pending
+        </a>
+        <a href="<?= url('/admin/transactions?status=success') ?>" 
+           class="px-4 py-2 rounded-lg <?= $currentStatus === 'success' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?>">
+            Success
+        </a>
+        <a href="<?= url('/admin/transactions?status=failed') ?>" 
+           class="px-4 py-2 rounded-lg <?= $currentStatus === 'failed' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?>">
+            Failed
+        </a>
+    </div>
+</div>
+
+<!-- Transactions Table -->
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <?php if (empty($transactions)): ?>
+        <div class="p-12 text-center">
+            <i class="fas fa-receipt text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500 text-lg">Tidak ada transaksi ditemukan</p>
+        </div>
+    <?php else: ?>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID Transaksi</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tenant</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kost / Kamar</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Periode</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <?php foreach ($transactions as $transaction): ?>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">
+                                <p class="font-mono text-sm text-gray-800"><?= e($transaction['transaction_id']) ?></p>
+                                <p class="text-xs text-gray-500">Order: #<?= $transaction['id'] ?></p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <p class="font-medium text-gray-800"><?= e($transaction['tenant_name'] ?? '-') ?></p>
+                                <p class="text-sm text-gray-500"><?= e($transaction['tenant_email'] ?? '-') ?></p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <p class="font-medium text-gray-800"><?= e($transaction['kost_name'] ?? '-') ?></p>
+                                <p class="text-sm text-gray-500"><?= e($transaction['kamar_name'] ?? '-') ?></p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <p class="text-sm text-gray-700">
+                                    <?= date('d M Y', strtotime($transaction['start_date'])) ?>
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    s/d <?= date('d M Y', strtotime($transaction['end_date'])) ?>
+                                </p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <p class="font-bold text-blue-600">
+                                    Rp <?= number_format($transaction['amount'], 0, ',', '.') ?>
+                                </p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 text-xs font-medium rounded-full
+                                    <?= $transaction['payment_status'] === 'success' ? 'bg-green-100 text-green-800' : 
+                                        ($transaction['payment_status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') ?>">
+                                    <?= ucfirst($transaction['payment_status'] ?? 'pending') ?>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <p class="text-sm text-gray-700">
+                                    <?= date('d M Y', strtotime($transaction['created_at'])) ?>
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    <?= date('H:i', strtotime($transaction['created_at'])) ?>
+                                </p>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <a href="<?= url('/admin/transactions/' . $transaction['id']) ?>" 
+                                   class="inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                                    <i class="fas fa-eye mr-1"></i> Detail
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>

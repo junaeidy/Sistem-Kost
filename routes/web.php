@@ -55,17 +55,21 @@ $router->middleware(['auth', 'admin'])->get('/admin/dashboard', 'Admin\Dashboard
 
 // Owner Management
 $router->middleware(['auth', 'admin'])->get('/admin/owners', 'Admin\OwnerController@index');
-$router->middleware(['auth', 'admin'])->get('/admin/owners/pending', 'Admin\OwnerController@pending');
 $router->middleware(['auth', 'admin'])->get('/admin/owners/{id}', 'Admin\OwnerController@show');
 $router->middleware(['auth', 'admin'])->post('/admin/owners/{id}/approve', 'Admin\OwnerController@approve');
 $router->middleware(['auth', 'admin'])->post('/admin/owners/{id}/reject', 'Admin\OwnerController@reject');
+$router->middleware(['auth', 'admin'])->post('/admin/owners/{id}/suspend', 'Admin\OwnerController@suspend');
+$router->middleware(['auth', 'admin'])->post('/admin/owners/{id}/activate', 'Admin\OwnerController@activate');
 
 // Kost Management (Admin view)
 $router->middleware(['auth', 'admin'])->get('/admin/kost', 'Admin\KostController@index');
 $router->middleware(['auth', 'admin'])->get('/admin/kost/{id}', 'Admin\KostController@show');
+$router->middleware(['auth', 'admin'])->post('/admin/kost/{id}/status', 'Admin\KostController@updateStatus');
+$router->middleware(['auth', 'admin'])->post('/admin/kost/{id}/delete', 'Admin\KostController@delete');
 
 // Transaction Management
 $router->middleware(['auth', 'admin'])->get('/admin/transactions', 'Admin\TransactionController@index');
+$router->middleware(['auth', 'admin'])->get('/admin/transactions/{id}', 'Admin\TransactionController@show');
 
 // ================================================================
 // OWNER ROUTES

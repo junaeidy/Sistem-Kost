@@ -17,6 +17,7 @@ public/uploads/kost/*
 public/uploads/ktp/*
 public/uploads/profile/*
 instruction/
+docs/
 # Keep directory structure
 !public/uploads/kost/.gitkeep
 !public/uploads/ktp/.gitkeep

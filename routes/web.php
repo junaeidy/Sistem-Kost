@@ -115,15 +115,29 @@ $router->middleware(['auth', 'owner'])->post('/owner/profile/delete-photo', 'Own
 // TENANT ROUTES
 // ================================================================
 
+// Dashboard
 $router->middleware(['auth', 'tenant'])->get('/tenant/dashboard', 'Tenant\DashboardController@index');
+$router->middleware(['auth', 'tenant'])->get('/tenant/bookings-list', 'Tenant\DashboardController@bookings');
+$router->middleware(['auth', 'tenant'])->get('/tenant/booking-detail/{id}', 'Tenant\DashboardController@bookingDetail');
 
-// Booking
+// Search & Filter
+$router->middleware(['auth', 'tenant'])->get('/tenant/search', 'Tenant\SearchController@index');
+$router->middleware(['auth', 'tenant'])->get('/tenant/search/{id}', 'Tenant\SearchController@detail');
+
+// Booking Management
 $router->middleware(['auth', 'tenant'])->get('/tenant/bookings', 'Tenant\BookingController@index');
 $router->middleware(['auth', 'tenant'])->get('/tenant/kamar/{id}/book', 'Tenant\BookingController@create');
 $router->middleware(['auth', 'tenant'])->post('/tenant/bookings', 'Tenant\BookingController@store');
 $router->middleware(['auth', 'tenant'])->get('/tenant/bookings/{id}', 'Tenant\BookingController@show');
+$router->middleware(['auth', 'tenant'])->post('/tenant/bookings/{id}/cancel', 'Tenant\BookingController@cancel');
 
-// Payment
+// Profile Management
+$router->middleware(['auth', 'tenant'])->get('/tenant/profile', 'Tenant\ProfileController@index');
+$router->middleware(['auth', 'tenant'])->post('/tenant/profile/update', 'Tenant\ProfileController@updateProfile');
+$router->middleware(['auth', 'tenant'])->post('/tenant/profile/update-password', 'Tenant\ProfileController@updatePassword');
+$router->middleware(['auth', 'tenant'])->post('/tenant/profile/delete-photo', 'Tenant\ProfileController@deletePhoto');
+
+// Payment (will be implemented in Phase 8)
 $router->middleware(['auth', 'tenant'])->get('/tenant/payment/{id}', 'Tenant\PaymentController@create');
 $router->middleware(['auth', 'tenant'])->get('/tenant/payment/success', 'Tenant\PaymentController@success');
 $router->middleware(['auth', 'tenant'])->get('/tenant/payment/failed', 'Tenant\PaymentController@failed');

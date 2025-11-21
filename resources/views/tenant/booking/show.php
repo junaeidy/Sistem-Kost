@@ -1,0 +1,354 @@
+<?php 
+$pageTitle = $pageTitle ?? 'Detail Booking';
+$booking = $booking ?? [];
+$payment = $payment ?? null;
+?>
+
+<!-- Back Button -->
+<div class="mb-4">
+    <a href="<?= url('/tenant/bookings') ?>" class="text-blue-600 hover:text-blue-700">
+        <i class="fas fa-arrow-left mr-2"></i>
+        Kembali ke Daftar Booking
+    </a>
+</div>
+
+<!-- Status Alert -->
+<?php
+$statusConfig = [
+    'waiting_payment' => [
+        'bg' => 'bg-yellow-50',
+        'border' => 'border-yellow-200',
+        'text' => 'text-yellow-800',
+        'icon' => 'fas fa-clock',
+        'title' => 'Menunggu Pembayaran',
+        'message' => 'Silakan lakukan pembayaran untuk melanjutkan booking Anda.'
+    ],
+    'paid' => [
+        'bg' => 'bg-blue-50',
+        'border' => 'border-blue-200',
+        'text' => 'text-blue-800',
+        'icon' => 'fas fa-check-circle',
+        'title' => 'Pembayaran Berhasil',
+        'message' => 'Pembayaran Anda telah diterima. Menunggu konfirmasi dari pemilik kost.'
+    ],
+    'accepted' => [
+        'bg' => 'bg-green-50',
+        'border' => 'border-green-200',
+        'text' => 'text-green-800',
+        'icon' => 'fas fa-check-double',
+        'title' => 'Booking Diterima',
+        'message' => 'Booking Anda telah diterima oleh pemilik kost. Hubungi pemilik untuk detail lebih lanjut.'
+    ],
+    'active_rent' => [
+        'bg' => 'bg-green-50',
+        'border' => 'border-green-200',
+        'text' => 'text-green-800',
+        'icon' => 'fas fa-home',
+        'title' => 'Sewa Aktif',
+        'message' => 'Anda sedang menyewa kamar ini.'
+    ],
+    'completed' => [
+        'bg' => 'bg-gray-50',
+        'border' => 'border-gray-200',
+        'text' => 'text-gray-800',
+        'icon' => 'fas fa-flag-checkered',
+        'title' => 'Sewa Selesai',
+        'message' => 'Periode sewa Anda telah selesai.'
+    ],
+    'rejected' => [
+        'bg' => 'bg-red-50',
+        'border' => 'border-red-200',
+        'text' => 'text-red-800',
+        'icon' => 'fas fa-times-circle',
+        'title' => 'Booking Ditolak',
+        'message' => 'Maaf, booking Anda ditolak oleh pemilik kost.'
+    ],
+    'cancelled' => [
+        'bg' => 'bg-red-50',
+        'border' => 'border-red-200',
+        'text' => 'text-red-800',
+        'icon' => 'fas fa-ban',
+        'title' => 'Booking Dibatalkan',
+        'message' => 'Booking ini telah dibatalkan.'
+    ]
+];
+
+$config = $statusConfig[$booking['status']] ?? $statusConfig['waiting_payment'];
+?>
+
+<div class="<?= $config['bg'] ?> border <?= $config['border'] ?> rounded-lg p-4 mb-6">
+    <div class="flex items-start">
+        <i class="<?= $config['icon'] ?> <?= $config['text'] ?> text-2xl mr-3"></i>
+        <div>
+            <h3 class="font-semibold <?= $config['text'] ?> text-lg"><?= $config['title'] ?></h3>
+            <p class="<?= $config['text'] ?> text-sm mt-1"><?= $config['message'] ?></p>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Booking Information -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                Informasi Booking
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-500">Booking ID</p>
+                    <p class="font-semibold text-gray-800">#<?= str_pad($booking['id'], 6, '0', STR_PAD_LEFT) ?></p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500">Tanggal Booking</p>
+                    <p class="font-semibold text-gray-800">
+                        <?= date('d M Y H:i', strtotime($booking['created_at'])) ?>
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500">Tanggal Mulai</p>
+                    <p class="font-semibold text-gray-800">
+                        <?= date('d M Y', strtotime($booking['start_date'])) ?>
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500">Tanggal Selesai</p>
+                    <p class="font-semibold text-gray-800">
+                        <?= date('d M Y', strtotime($booking['end_date'])) ?>
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500">Durasi</p>
+                    <p class="font-semibold text-gray-800">
+                        <?= $booking['duration_months'] ?> Bulan
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500">Status</p>
+                    <span class="inline-block px-3 py-1 <?= $config['bg'] ?> <?= $config['text'] ?> text-sm font-semibold rounded-full">
+                        <?= $config['title'] ?>
+                    </span>
+                </div>
+            </div>
+
+            <?php if (!empty($booking['notes'])): ?>
+                <div class="mt-4 pt-4 border-t">
+                    <p class="text-sm text-gray-500 mb-1">Catatan</p>
+                    <p class="text-gray-700"><?= nl2br(e($booking['notes'])) ?></p>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Kost & Room Information -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-building text-blue-600 mr-2"></i>
+                Informasi Kost & Kamar
+            </h2>
+
+            <div class="flex items-start mb-4">
+                <?php if ($booking['kost_photo']): ?>
+                    <img src="<?= url('/' . $booking['kost_photo']) ?>" 
+                         alt="<?= e($booking['kost_name']) ?>"
+                         class="w-24 h-24 object-cover rounded-lg mr-4">
+                <?php endif; ?>
+                
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800"><?= e($booking['kost_name']) ?></h3>
+                    <p class="text-gray-600">Kamar: <?= e($booking['kamar_name']) ?></p>
+                    <div class="text-sm text-gray-600 mt-2">
+                        <i class="fas fa-map-marker-alt text-red-500 mr-1"></i>
+                        <?= e($booking['kost_address']) ?>
+                    </div>
+                    <?php if ($booking['kost_location']): ?>
+                        <p class="text-sm text-gray-500 mt-1"><?= e($booking['kost_location']) ?></p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Room Facilities -->
+            <?php if (!empty($booking['kamar_facilities_array'])): ?>
+                <div class="mt-4 pt-4 border-t">
+                    <h4 class="font-semibold text-gray-800 mb-2">Fasilitas Kamar</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <?php foreach ($booking['kamar_facilities_array'] as $facility): ?>
+                            <div class="flex items-center text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span><?= e($facility) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Kost Facilities -->
+            <?php if (!empty($booking['kost_facilities_array'])): ?>
+                <div class="mt-4 pt-4 border-t">
+                    <h4 class="font-semibold text-gray-800 mb-2">Fasilitas Umum</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <?php foreach ($booking['kost_facilities_array'] as $facility): ?>
+                            <div class="flex items-center text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span><?= e($facility) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <a href="<?= url('/tenant/search/' . $booking['kost_id']) ?>" 
+               class="block mt-4 text-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Lihat Detail Kost
+            </a>
+        </div>
+
+        <!-- Payment Information -->
+        <?php if ($payment): ?>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-credit-card text-green-600 mr-2"></i>
+                Informasi Pembayaran
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-500">Order ID</p>
+                    <p class="font-semibold text-gray-800"><?= e($payment['midtrans_order_id']) ?></p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500">Status Pembayaran</p>
+                    <span class="inline-block px-3 py-1 <?= $payment['payment_status'] === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' ?> text-sm font-semibold rounded-full">
+                        <?= ucfirst($payment['payment_status']) ?>
+                    </span>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500">Jumlah</p>
+                    <p class="text-xl font-bold text-blue-600">
+                        Rp <?= number_format($payment['amount'], 0, ',', '.') ?>
+                    </p>
+                </div>
+
+                <?php if ($payment['payment_type']): ?>
+                <div>
+                    <p class="text-sm text-gray-500">Metode Pembayaran</p>
+                    <p class="font-semibold text-gray-800"><?= ucwords(str_replace('_', ' ', $payment['payment_type'])) ?></p>
+                </div>
+                <?php endif; ?>
+
+                <?php if ($payment['paid_at']): ?>
+                <div>
+                    <p class="text-sm text-gray-500">Tanggal Bayar</p>
+                    <p class="font-semibold text-gray-800">
+                        <?= date('d M Y H:i', strtotime($payment['paid_at'])) ?>
+                    </p>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+        
+        <!-- Price Summary -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Rincian Biaya</h3>
+            
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Harga per Bulan</span>
+                    <span class="font-semibold">Rp <?= number_format($booking['kamar_price'], 0, ',', '.') ?></span>
+                </div>
+
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Durasi</span>
+                    <span class="font-semibold"><?= $booking['duration_months'] ?> Bulan</span>
+                </div>
+
+                <div class="border-t pt-2 mt-2">
+                    <div class="flex justify-between">
+                        <span class="font-semibold text-gray-800">Total Biaya</span>
+                        <span class="text-xl font-bold text-blue-600">
+                            Rp <?= number_format($booking['total_price'], 0, ',', '.') ?>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Owner Contact -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                <i class="fas fa-user-tie text-gray-600 mr-2"></i>
+                Kontak Pemilik
+            </h3>
+            
+            <div class="space-y-3">
+                <div>
+                    <p class="text-sm text-gray-500">Nama</p>
+                    <p class="font-semibold text-gray-800"><?= e($booking['owner_name']) ?></p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500">No. Telepon</p>
+                    <a href="tel:<?= e($booking['owner_phone']) ?>" 
+                       class="font-semibold text-blue-600 hover:text-blue-700">
+                        <?= e($booking['owner_phone']) ?>
+                    </a>
+                </div>
+
+                <a href="https://wa.me/62<?= ltrim($booking['owner_phone'], '0') ?>" 
+                   target="_blank"
+                   class="block w-full mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-center transition">
+                    <i class="fab fa-whatsapp mr-2"></i>
+                    Chat WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Aksi</h3>
+            
+            <div class="space-y-3">
+                <?php if ($booking['status'] === 'waiting_payment'): ?>
+                    <a href="<?= url('/tenant/payment/' . $booking['id']) ?>" 
+                       class="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center transition">
+                        <i class="fas fa-credit-card mr-2"></i>
+                        Bayar Sekarang
+                    </a>
+                    
+                    <form method="POST" action="<?= url('/tenant/bookings/' . $booking['id'] . '/cancel') ?>" 
+                          onsubmit="return confirm('Yakin ingin membatalkan booking ini?')">
+                        <button type="submit" 
+                                class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                            <i class="fas fa-times mr-2"></i>
+                            Batalkan Booking
+                        </button>
+                    </form>
+                <?php endif; ?>
+
+                <a href="<?= url('/tenant/bookings') ?>" 
+                   class="block w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-center transition">
+                    <i class="fas fa-list mr-2"></i>
+                    Lihat Semua Booking
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>

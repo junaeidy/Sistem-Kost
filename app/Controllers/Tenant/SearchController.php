@@ -1,48 +1,41 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Tenant;
 
 use Core\Controller;
+use Core\Session;
+use App\Models\TenantModel;
 use App\Models\KostModel;
 
 /**
- * Home Controller
- * Handles public pages
+ * Tenant Search Controller
+ * Handles kost search and filtering
  */
-class HomeController extends Controller
+class SearchController extends Controller
 {
+    private $tenantModel;
     private $kostModel;
 
     public function __construct()
     {
+        $this->tenantModel = new TenantModel();
         $this->kostModel = new KostModel();
     }
 
     /**
-     * Homepage
+     * Show search page with filters
      */
     public function index()
     {
-        // Get featured kost (latest 6)
-        $featuredKost = $this->kostModel->search([
-            'available_only' => true,
-            'sort_by' => 'created_at',
-            'sort_order' => 'DESC'
-        ]);
+        $userId = Session::get('user_id');
+        $tenant = $this->tenantModel->findByUserId($userId);
         
-        $featuredKost = array_slice($featuredKost, 0, 6);
+        if (!$tenant) {
+            $this->flash('error', 'Profil tenant tidak ditemukan.');
+            $this->redirect(url('/login'));
+            return;
+        }
 
-        $this->view('home/index', [
-            'title' => 'Beranda',
-            'featuredKost' => $featuredKost
-        ]);
-    }
-
-    /**
-     * Search kost (Public - No Auth Required)
-     */
-    public function search()
-    {
         // Get filters from query string
         $filters = [
             'location' => $_GET['location'] ?? '',
@@ -68,33 +61,46 @@ class HomeController extends Controller
             $kostList = $this->kostModel->search(['available_only' => true]);
         }
 
-        $this->view('home/search', [
+        $this->view('tenant/search/index', [
             'title' => 'Cari Kost',
+            'pageTitle' => 'Cari Kost',
+            'tenant' => $tenant,
             'kostList' => $kostList,
             'filters' => $filters,
             'isSearching' => $isSearching,
             'totalResults' => count($kostList)
-        ]);
+        ], 'layouts/dashboard');
     }
 
     /**
-     * Kost detail (Public - No Auth Required)
+     * Show kost detail for tenant
+     * 
+     * @param int $id Kost ID
      */
     public function detail($id)
     {
+        $userId = Session::get('user_id');
+        $tenant = $this->tenantModel->findByUserId($userId);
+        
+        if (!$tenant) {
+            $this->flash('error', 'Profil tenant tidak ditemukan.');
+            $this->redirect(url('/login'));
+            return;
+        }
+
         // Get kost detail with rooms
         $kost = $this->kostModel->getDetailWithRooms($id);
 
         if (!$kost) {
             $this->flash('error', 'Kost tidak ditemukan.');
-            $this->redirect(url('/search'));
+            $this->redirect(url('/tenant/search'));
             return;
         }
 
         // Check if kost is active
         if ($kost['status'] !== 'active') {
             $this->flash('error', 'Kost ini tidak tersedia.');
-            $this->redirect(url('/search'));
+            $this->redirect(url('/tenant/search'));
             return;
         }
 
@@ -128,10 +134,12 @@ class HomeController extends Controller
         // Limit to 4 similar kost
         $similarKost = array_slice($similarKost, 0, 4);
 
-        $this->view('home/detail', [
+        $this->view('tenant/search/detail', [
             'title' => $kost['name'],
+            'pageTitle' => $kost['name'],
+            'tenant' => $tenant,
             'kost' => $kost,
             'similarKost' => $similarKost
-        ]);
+        ], 'layouts/dashboard');
     }
 }

@@ -8,8 +8,15 @@ $kosts = $kosts ?? [];
 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
     <div class="flex items-start justify-between mb-6">
         <div class="flex items-start">
-            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mr-6">
-                <i class="fas fa-user text-4xl text-blue-600"></i>
+            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mr-6 overflow-hidden">
+                <?php if (!empty($owner['profile_photo'])): ?>
+                    <img src="<?= asset($owner['profile_photo']) ?>" 
+                         alt="Profile Photo" 
+                         class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition"
+                         onclick="window.open(this.src, '_blank')">
+                <?php else: ?>
+                    <i class="fas fa-user text-4xl text-blue-600"></i>
+                <?php endif; ?>
             </div>
             <div>
                 <h2 class="text-2xl font-bold text-gray-800 mb-2"><?= e($owner['name']) ?></h2>
@@ -40,21 +47,28 @@ $kosts = $kosts ?? [];
         </div>
     </div>
 
-    <!-- KTP Photo -->
-    <?php if (!empty($owner['ktp_photo'])): ?>
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                <i class="fas fa-id-card mr-2"></i>Foto KTP
-            </h3>
-            <div class="max-w-md">
+    <!-- Photos Grid -->
+    <div class="mb-6">
+        <!-- KTP Photo -->
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">
+            <i class="fas fa-id-card mr-2"></i>Foto KTP
+        </h3>
+        <div class="max-w-md rounded-lg border border-gray-300 overflow-hidden shadow-sm">
+            <?php if (!empty($owner['ktp_photo'])): ?>
                 <img src="<?= asset($owner['ktp_photo']) ?>" 
                      alt="KTP" 
-                     class="w-full rounded-lg border border-gray-300 shadow-sm"
+                     class="w-full h-64 object-cover cursor-pointer hover:opacity-90 transition"
                      onclick="window.open(this.src, '_blank')">
-                <p class="text-xs text-gray-500 mt-2">Klik gambar untuk memperbesar</p>
-            </div>
+            <?php else: ?>
+                <img src="https://placehold.co/600x400?text=No+Image" 
+                     alt="No KTP Image" 
+                     class="w-full h-64 object-cover">
+            <?php endif; ?>
         </div>
-    <?php endif; ?>
+        <p class="text-xs text-gray-500 mt-2">
+            <?= !empty($owner['ktp_photo']) ? 'Klik gambar untuk memperbesar' : 'Belum ada foto KTP' ?>
+        </p>
+    </div>
 
     <!-- Action Buttons -->
     <div class="border-t border-gray-200 pt-6">

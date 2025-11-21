@@ -45,7 +45,7 @@ $kamars = $kamars ?? [];
             <i class="fas fa-venus-mars text-2xl text-purple-600 mb-2"></i>
             <p class="text-sm text-gray-600">Tipe</p>
             <p class="font-semibold text-gray-800">
-                <?= $kost['gender_type'] === 'male' ? 'Putra' : ($kost['gender_type'] === 'female' ? 'Putri' : 'Campur') ?>
+                <?= $kost['gender_type'] === 'putra' ? 'Khusus Putra' : ($kost['gender_type'] === 'putri' ? 'Khusus Putri' : 'Campur') ?>
             </p>
         </div>
         <div class="text-center">
@@ -69,9 +69,21 @@ $kamars = $kamars ?? [];
         </h3>
         <div class="flex flex-wrap gap-2">
             <?php 
-            $facilities = explode(',', $kost['facilities'] ?? '');
+            $facilitiesData = $kost['facilities'] ?? '';
+            $facilities = [];
+            
+            // Check if it's JSON format
+            if (!empty($facilitiesData)) {
+                if (strpos($facilitiesData, '[') === 0) {
+                    // It's JSON format
+                    $facilities = json_decode($facilitiesData, true) ?? [];
+                } else {
+                    // It's comma-separated format
+                    $facilities = array_filter(array_map('trim', explode(',', $facilitiesData)));
+                }
+            }
+            
             foreach ($facilities as $facility): 
-                $facility = trim($facility);
                 if (!empty($facility)):
             ?>
                 <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
@@ -110,12 +122,12 @@ $kamars = $kamars ?? [];
                         <?php if (!empty($photo['photo_url'])): ?>
                             <img src="<?= asset($photo['photo_url']) ?>" 
                                  alt="Kost Photo" 
-                                 class="w-full h-40 object-cover rounded-lg cursor-pointer"
+                                 class="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-90 transition"
                                  onclick="window.open(this.src, '_blank')">
                         <?php else: ?>
-                            <div class="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-image text-gray-400 text-3xl"></i>
-                            </div>
+                            <img src="https://placehold.co/600x400?text=No+Image" 
+                                 alt="No Photo" 
+                                 class="w-full h-40 object-cover rounded-lg">
                         <?php endif; ?>
                         <?php if ($photo['is_primary']): ?>
                             <span class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-white text-xs rounded-full">
@@ -192,9 +204,25 @@ $kamars = $kamars ?? [];
                     <div class="text-sm text-gray-600">
                         <p><i class="fas fa-ruler-combined mr-1"></i> <?= e($kamar['size'] ?? '-') ?> m²</p>
                         <?php if (!empty($kamar['facilities'])): ?>
-                            <p class="mt-1 text-xs">
-                                <?= e(substr($kamar['facilities'], 0, 50)) ?><?= strlen($kamar['facilities']) > 50 ? '...' : '' ?>
-                            </p>
+                            <?php 
+                            $kamarFacilities = [];
+                            $facilitiesData = $kamar['facilities'];
+                            if (strpos($facilitiesData, '[') === 0) {
+                                $kamarFacilities = json_decode($facilitiesData, true) ?? [];
+                            } else {
+                                $kamarFacilities = array_filter(array_map('trim', explode(',', $facilitiesData)));
+                            }
+                            ?>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                <?php foreach (array_slice($kamarFacilities, 0, 3) as $facility): ?>
+                                    <span class="px-2 py-1 bg-gray-200 text-gray-800 rounded text-xs">
+                                        <?= e($facility) ?>
+                                    </span>
+                                <?php endforeach; ?>
+                                <?php if (count($kamarFacilities) > 3): ?>
+                                    <span class="px-2 py-1 text-gray-500 text-xs">+<?= count($kamarFacilities) - 3 ?> lagi</span>
+                                <?php endif; ?>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>

@@ -82,28 +82,39 @@ $facilities = !empty($kost['facilities']) ? json_decode($kost['facilities'], tru
         </div>
 
         <!-- Photos -->
-        <?php if (!empty($photos)): ?>
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Foto Kost</h3>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <?php foreach ($photos as $photo): ?>
-                    <div class="relative group">
-                        <?php if (!empty($photo['photo_url'])): ?>
-                            <img src="<?= asset($photo['photo_url']) ?>" 
-                                 alt="Kost Photo" 
-                                 class="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-75 transition"
-                                 onclick="window.open(this.src, '_blank')">
+            <?php if (!empty($photos)): ?>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <?php foreach ($photos as $photo): ?>
+                        <div class="relative group">
+                            <?php if (!empty($photo['photo_url'])): ?>
+                                <img src="<?= asset($photo['photo_url']) ?>" 
+                                     alt="Kost Photo" 
+                                     class="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-75 transition"
+                                     onclick="window.open(this.src, '_blank')">
+                            <?php else: ?>
+                                <img src="https://placehold.co/600x400?text=No+Image" 
+                                     alt="No Photo" 
+                                     class="w-full h-40 object-cover rounded-lg">
+                            <?php endif; ?>
                             <?php if ($photo['is_primary']): ?>
                                 <span class="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-white text-xs rounded-full">
                                     <i class="fas fa-star"></i> Primary
                                 </span>
                             <?php endif; ?>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="text-center py-8">
+                    <img src="https://placehold.co/600x400?text=No+Image" 
+                         alt="No Photos" 
+                         class="w-full max-w-md h-40 object-cover rounded-lg mx-auto">
+                    <p class="text-gray-500 text-sm mt-3">Belum ada foto kost</p>
+                </div>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
     </div>
 
     <!-- Sidebar -->

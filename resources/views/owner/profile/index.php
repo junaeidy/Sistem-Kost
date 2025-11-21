@@ -20,13 +20,12 @@ $owner = $owner ?? [];
                     <?php if (!empty($owner['profile_photo'])): ?>
                         <img src="<?= asset($owner['profile_photo']) ?>" 
                              alt="Profile Photo" 
-                             class="w-32 h-32 rounded-full object-cover border-4 border-blue-100 mb-4">
+                             class="w-32 h-32 rounded-full object-cover border-4 border-blue-100 mb-4 cursor-pointer hover:opacity-90 transition"
+                             onclick="window.open(this.src, '_blank')">
                     <?php else: ?>
-                        <div class="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center border-4 border-blue-100 mb-4">
-                            <span class="text-4xl text-white font-bold">
-                                <?= strtoupper(substr($owner['name'], 0, 1)) ?>
-                            </span>
-                        </div>
+                        <img src="https://placehold.co/200x200?text=No+Image" 
+                             alt="No Profile Photo" 
+                             class="w-32 h-32 rounded-full object-cover border-4 border-blue-100 mb-4">
                     <?php endif; ?>
 
                     <p class="text-center font-semibold text-gray-800 mb-1"><?= e($owner['name']) ?></p>

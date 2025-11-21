@@ -583,6 +583,26 @@ function generateUniqueBookingId()
     do {
         $bookingId = generateBookingId();
     } while (!isBookingIdUnique($bookingId));
-    
+
     return $bookingId;
 }
+
+/**
+ * Get placeholder image URL
+ * Returns a placeholder image if image path is empty
+ * 
+ * @param string $imageUrl Image URL
+ * @param int $width Image width (default: 600)
+ * @param int $height Image height (default: 400)
+ * @param string $text Placeholder text (default: No+Image)
+ * @return string
+ */
+function placeholder($imageUrl, $width = 600, $height = 400, $text = 'No+Image')
+{
+    if (!empty($imageUrl)) {
+        return $imageUrl;
+    }
+    
+    return "https://placehold.co/{$width}x{$height}?text={$text}";
+}
+

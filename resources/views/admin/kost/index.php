@@ -78,9 +78,9 @@ $currentStatus = $currentStatus ?? 'all';
                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs rounded-full
-                                    <?= $kost['gender_type'] === 'male' ? 'bg-blue-100 text-blue-800' : 
-                                        ($kost['gender_type'] === 'female' ? 'bg-pink-100 text-pink-800' : 'bg-purple-100 text-purple-800') ?>">
-                                    <?= $kost['gender_type'] === 'male' ? 'Putra' : ($kost['gender_type'] === 'female' ? 'Putri' : 'Campur') ?>
+                                    <?= $kost['gender_type'] === 'putra' ? 'bg-blue-100 text-blue-800' : 
+                                        ($kost['gender_type'] === 'putri' ? 'bg-pink-100 text-pink-800' : 'bg-purple-100 text-purple-800') ?>">
+                                    <?= $kost['gender_type'] === 'putra' ? 'Putra' : ($kost['gender_type'] === 'putri' ? 'Putri' : 'Campur') ?>
                                 </span>
                             </td>
                             <td class="px-6 py-4">

@@ -129,11 +129,76 @@ class KostController extends Controller
         $kostId = $stmt ? $this->db->getConnection()->lastInsertId() : false;
 
         if ($kostId) {
+            // Handle photo upload
+            $this->handlePhotoUpload($kostId);
+            
             $this->flash('success', 'Kost berhasil ditambahkan.');
             $this->redirect(url('/owner/kost/' . $kostId));
         } else {
             $this->flash('error', 'Gagal menambahkan kost.');
             $this->back();
+        }
+    }
+
+    /**
+     * Handle photo upload for kost
+     */
+    private function handlePhotoUpload($kostId)
+    {
+        if (!isset($_FILES['photos']) || empty($_FILES['photos']['name'][0])) {
+            return;
+        }
+
+        $uploadDir = dirname(dirname(dirname(__DIR__))) . '/public/uploads/kost/';
+        
+        // Create directory if not exists
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $files = $_FILES['photos'];
+        $isFirstPhoto = true;
+
+        for ($i = 0; $i < count($files['name']); $i++) {
+            if ($files['error'][$i] !== UPLOAD_ERR_OK) {
+                continue;
+            }
+
+            $fileName = $files['name'][$i];
+            $fileTmp = $files['tmp_name'][$i];
+            $fileSize = $files['size'][$i];
+            $fileType = $files['type'][$i];
+
+            // Validate file
+            if ($fileSize > 5 * 1024 * 1024) { // 5MB
+                continue;
+            }
+
+            if (!in_array($fileType, ['image/jpeg', 'image/jpg', 'image/png'])) {
+                continue;
+            }
+
+            // Generate unique filename
+            $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
+            $newFileName = 'kost_' . $kostId . '_' . time() . '_' . rand(1000, 9999) . '.' . $fileExt;
+            $filePath = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($fileTmp, $filePath)) {
+                $photoUrl = 'uploads/kost/' . $newFileName;
+                $isPrimary = $isFirstPhoto ? 1 : 0;
+
+                $photoQuery = "INSERT INTO kost_photos (kost_id, photo_url, is_primary, display_order, created_at)
+                              VALUES (:kost_id, :photo_url, :is_primary, :display_order, NOW())";
+                
+                $this->db->query($photoQuery, [
+                    'kost_id' => $kostId,
+                    'photo_url' => $photoUrl,
+                    'is_primary' => $isPrimary,
+                    'display_order' => $i
+                ]);
+
+                $isFirstPhoto = false;
+            }
         }
     }
 
@@ -187,10 +252,15 @@ class KostController extends Controller
             return;
         }
 
+        // Get photos
+        $photosQuery = "SELECT * FROM kost_photos WHERE kost_id = :kost_id ORDER BY is_primary DESC";
+        $photos = $this->db->fetchAll($photosQuery, ['kost_id' => $id]);
+
         $this->view('owner/kost/edit', [
             'title' => 'Edit Kost',
             'pageTitle' => 'Edit Kost',
-            'kost' => $kost
+            'kost' => $kost,
+            'photos' => $photos
         ], 'layouts/dashboard');
     }
 
@@ -266,6 +336,9 @@ class KostController extends Controller
         $stmt = $this->db->query($query, $params);
 
         if ($stmt) {
+            // Handle photo upload
+            $this->handlePhotoUpload($id);
+            
             $this->flash('success', 'Kost berhasil diupdate.');
         } else {
             $this->flash('error', 'Gagal mengupdate kost.');

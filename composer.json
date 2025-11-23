@@ -4,8 +4,9 @@
     "type": "project",
     "require": {
         "php": ">=7.4",
+        "ezyang/htmlpurifier": "^4.16",
         "midtrans/midtrans-php": "^2.5",
-        "ezyang/htmlpurifier": "^4.16"
+        "phpmailer/phpmailer": "^7.0"
     },
     "require-dev": {
         "symfony/var-dumper": "^5.4"
@@ -13,7 +14,8 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Core\\": "core/"
+            "Core\\": "core/",
+            "Helpers\\": "helpers/"
         },
         "files": [
             "helpers/functions.php"

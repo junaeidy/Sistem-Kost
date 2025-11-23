@@ -87,7 +87,15 @@ class BookingController extends Controller
         // Check if room is available
         if ($kamar['status'] !== 'available') {
             $this->flash('error', 'Kamar ini tidak tersedia.');
-            $this->redirect(url('/tenant/search/' . $kamar['kost_id']));
+            $this->redirect(url('/kost/' . $kamar['kost_id']));
+            return;
+        }
+        
+        // Double check: verify no active bookings for this room
+        $hasActiveBooking = $this->bookingModel->hasActiveBookingForRoom($kamarId);
+        if ($hasActiveBooking) {
+            $this->flash('error', 'Kamar ini sudah dibooking oleh pengguna lain.');
+            $this->redirect(url('/kost/' . $kamar['kost_id']));
             return;
         }
 
@@ -183,13 +191,24 @@ class BookingController extends Controller
             'notes' => $notes
         ];
 
-        $bookingId = $this->bookingModel->createBooking($bookingData);
+        try {
+            $bookingId = $this->bookingModel->createBooking($bookingData);
 
-        if ($bookingId) {
-            $this->flash('success', 'Booking berhasil dibuat. Silakan lakukan pembayaran.');
-            $this->redirect(url('/tenant/bookings/' . $bookingId));
-        } else {
-            $this->flash('error', 'Gagal membuat booking. Silakan coba lagi.');
+            if ($bookingId) {
+                // Log untuk debugging
+                error_log("Booking created successfully. ID: $bookingId, Status: waiting_payment");
+                
+                $this->flash('success', 'Booking berhasil dibuat. Silakan lakukan pembayaran.');
+                // Redirect langsung ke halaman pembayaran Midtrans
+                $this->redirect(url('/payment/create/' . $bookingId));
+            } else {
+                error_log("Failed to create booking. Data: " . json_encode($bookingData));
+                $this->flash('error', 'Gagal membuat booking. Silakan coba lagi.');
+                $this->redirect(url('/tenant/kamar/' . $kamarId . '/book'));
+            }
+        } catch (\Exception $e) {
+            error_log("Booking creation error: " . $e->getMessage());
+            $this->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
             $this->redirect(url('/tenant/kamar/' . $kamarId . '/book'));
         }
     }

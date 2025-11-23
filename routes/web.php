@@ -137,13 +137,27 @@ $router->middleware(['auth', 'tenant'])->post('/tenant/profile/update', 'Tenant\
 $router->middleware(['auth', 'tenant'])->post('/tenant/profile/update-password', 'Tenant\ProfileController@updatePassword');
 $router->middleware(['auth', 'tenant'])->post('/tenant/profile/delete-photo', 'Tenant\ProfileController@deletePhoto');
 
-// Payment (will be implemented in Phase 8)
+// ================================================================
+// PAYMENT ROUTES (Midtrans Integration)
+// ================================================================
+
+// Payment Process (Tenant)
+$router->middleware(['auth', 'tenant'])->get('/payment/create/{bookingId}', 'PaymentController@createTransaction');
+$router->middleware(['auth', 'tenant'])->get('/payment/success', 'PaymentController@success');
+$router->middleware(['auth', 'tenant'])->get('/payment/pending', 'PaymentController@pending');
+$router->middleware(['auth', 'tenant'])->get('/payment/failed', 'PaymentController@failed');
+$router->middleware(['auth', 'tenant'])->get('/payment/finish', 'PaymentController@finish');
+$router->middleware(['auth', 'tenant'])->get('/payment/error', 'PaymentController@error');
+$router->middleware(['auth', 'tenant'])->get('/payment/unfinish', 'PaymentController@unfinish');
+$router->middleware(['auth', 'tenant'])->get('/payment/check-status/{orderId}', 'PaymentController@checkStatus');
+
+// Payment Webhook (no auth required - validated by Midtrans signature)
+$router->post('/payment/notification', 'PaymentController@notification');
+
+// Legacy routes - redirect to new payment routes
 $router->middleware(['auth', 'tenant'])->get('/tenant/payment/{id}', 'Tenant\PaymentController@create');
 $router->middleware(['auth', 'tenant'])->get('/tenant/payment/success', 'Tenant\PaymentController@success');
 $router->middleware(['auth', 'tenant'])->get('/tenant/payment/failed', 'Tenant\PaymentController@failed');
-
-// Payment Webhook (no auth required - validated by Midtrans signature)
-$router->post('/payment/notification', 'Tenant\PaymentController@notification');
 
 // ================================================================
 // PROFILE ROUTES (All authenticated users)

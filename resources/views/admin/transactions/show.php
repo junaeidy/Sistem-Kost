@@ -97,10 +97,10 @@ $transaction = $transaction ?? [];
                     <span class="font-medium text-green-600"><i class="fas fa-check-circle mr-1"></i><?= date('d F Y H:i', strtotime($transaction['paid_at'])) ?></span>
                 </div>
                 <?php endif; ?>
-                <?php if (!empty($transaction['expired_at']) && $transaction['payment_status'] === 'pending'): ?>
+                <?php if (!empty($transaction['expires_at']) && $transaction['payment_status'] === 'pending'): ?>
                 <div class="flex justify-between">
                     <span class="text-gray-600">Berlaku Hingga</span>
-                    <span class="font-medium text-orange-600"><i class="fas fa-clock mr-1"></i><?= date('d F Y H:i', strtotime($transaction['expired_at'])) ?></span>
+                    <span class="font-medium text-orange-600"><i class="fas fa-clock mr-1"></i><?= date('d F Y H:i', strtotime($transaction['expires_at'])) ?></span>
                 </div>
                 <?php endif; ?>
             </div>

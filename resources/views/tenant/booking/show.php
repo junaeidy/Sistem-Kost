@@ -76,6 +76,27 @@ $statusConfig = [
 $config = $statusConfig[$booking['status']] ?? $statusConfig['waiting_payment'];
 ?>
 
+<!-- Payment Countdown Timer (if waiting for payment) -->
+<?php if ($booking['status'] === 'waiting_payment' && !empty($payment['expires_at'])): ?>
+<div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center">
+            <i class="fas fa-hourglass-half text-red-600 text-2xl mr-3"></i>
+            <div>
+                <h3 class="font-semibold text-red-800 text-lg">Waktu Pembayaran Tersisa</h3>
+                <p class="text-red-600 text-sm">Selesaikan pembayaran sebelum waktu habis</p>
+            </div>
+        </div>
+        <div id="countdown-timer" class="text-center" data-expires="<?= htmlspecialchars($payment['expires_at']) ?>">
+            <div class="text-3xl font-bold text-red-600">
+                <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
+            </div>
+            <p class="text-xs text-red-500 mt-1">Jam:Menit:Detik</p>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="<?= $config['bg'] ?> border <?= $config['border'] ?> rounded-lg p-4 mb-6">
     <div class="flex items-start">
         <i class="<?= $config['icon'] ?> <?= $config['text'] ?> text-2xl mr-3"></i>
@@ -101,7 +122,9 @@ $config = $statusConfig[$booking['status']] ?? $statusConfig['waiting_payment'];
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <p class="text-sm text-gray-500">Booking ID</p>
-                    <p class="font-semibold text-gray-800">#<?= str_pad($booking['id'], 6, '0', STR_PAD_LEFT) ?></p>
+                    <p class="font-semibold text-blue-600 font-mono text-lg">
+                        <?= htmlspecialchars($booking['booking_id'] ?? '#' . str_pad($booking['id'], 6, '0', STR_PAD_LEFT)) ?>
+                    </p>
                 </div>
 
                 <div>
@@ -326,11 +349,17 @@ $config = $statusConfig[$booking['status']] ?? $statusConfig['waiting_payment'];
             
             <div class="space-y-3">
                 <?php if ($booking['status'] === 'waiting_payment'): ?>
-                    <a href="<?= url('/tenant/payment/' . $booking['id']) ?>" 
-                       class="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center transition">
+                    <!-- Tombol Bayar Sekarang - Redirect ke Midtrans Payment -->
+                    <a href="<?= url('/payment/create/' . $booking['id']) ?>" 
+                       class="block w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center transition font-semibold text-lg">
                         <i class="fas fa-credit-card mr-2"></i>
                         Bayar Sekarang
                     </a>
+                    
+                    <p class="text-xs text-center text-gray-500">
+                        <i class="fas fa-lock mr-1"></i>
+                        Pembayaran aman dengan Midtrans
+                    </p>
                     
                     <form method="POST" action="<?= url('/tenant/bookings/' . $booking['id'] . '/cancel') ?>" 
                           onsubmit="return confirm('Yakin ingin membatalkan booking ini?')">
@@ -340,6 +369,20 @@ $config = $statusConfig[$booking['status']] ?? $statusConfig['waiting_payment'];
                             Batalkan Booking
                         </button>
                     </form>
+                    
+                <?php elseif ($booking['status'] === 'paid'): ?>
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                        <i class="fas fa-check-circle text-green-600 text-2xl mb-2"></i>
+                        <p class="text-green-800 font-semibold">Pembayaran Berhasil</p>
+                        <p class="text-sm text-green-600 mt-1">Menunggu konfirmasi owner</p>
+                    </div>
+                    
+                <?php elseif ($booking['status'] === 'accepted'): ?>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                        <i class="fas fa-check-double text-blue-600 text-2xl mb-2"></i>
+                        <p class="text-blue-800 font-semibold">Booking Diterima</p>
+                        <p class="text-sm text-blue-600 mt-1">Hubungi owner untuk check-in</p>
+                    </div>
                 <?php endif; ?>
 
                 <a href="<?= url('/tenant/bookings') ?>" 
@@ -352,3 +395,66 @@ $config = $statusConfig[$booking['status']] ?? $statusConfig['waiting_payment'];
 
     </div>
 </div>
+
+<!-- Countdown Timer Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const timerElement = document.getElementById('countdown-timer');
+    
+    if (!timerElement) return;
+    
+    const expiresAt = timerElement.dataset.expires;
+    if (!expiresAt) return;
+    
+    const expiryTime = new Date(expiresAt).getTime();
+    
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+    
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = expiryTime - now;
+        
+        if (distance < 0) {
+            // Expired
+            clearInterval(countdownInterval);
+            timerElement.innerHTML = '<div class="text-2xl font-bold text-red-600">WAKTU HABIS</div><p class="text-xs text-red-500 mt-1">Pembayaran expired</p>';
+            
+            // Reload page after 3 seconds to show expired status
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
+            return;
+        }
+        
+        // Calculate time units
+        const hours = Math.floor(distance / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        // Update display
+        hoursEl.textContent = String(hours).padStart(2, '0');
+        minutesEl.textContent = String(minutes).padStart(2, '0');
+        secondsEl.textContent = String(seconds).padStart(2, '0');
+        
+        // Change color when less than 1 hour remaining
+        if (hours === 0) {
+            hoursEl.classList.add('text-red-700');
+            minutesEl.classList.add('text-red-700');
+            secondsEl.classList.add('text-red-700');
+            
+            // Blink effect when less than 5 minutes
+            if (minutes < 5) {
+                timerElement.parentElement.classList.add('animate-pulse');
+            }
+        }
+    }
+    
+    // Update immediately
+    updateCountdown();
+    
+    // Update every second
+    const countdownInterval = setInterval(updateCountdown, 1000);
+});
+</script>

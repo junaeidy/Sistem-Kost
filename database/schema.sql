@@ -37,6 +37,7 @@ CREATE TABLE owners (
     name VARCHAR(255) NOT NULL,
     phone VARCHAR(20) NOT NULL,
     ktp_photo VARCHAR(255) DEFAULT NULL,
+    profile_photo VARCHAR(255) DEFAULT NULL,
     address TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -110,6 +111,7 @@ CREATE TABLE kamar (
     kost_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
+    size DECIMAL(6, 2) DEFAULT NULL COMMENT 'Room size in square meters',
     status ENUM('available', 'occupied', 'maintenance') DEFAULT 'available',
     facilities TEXT DEFAULT NULL COMMENT 'JSON array of room-specific facilities',
     description TEXT DEFAULT NULL,
@@ -126,6 +128,7 @@ CREATE TABLE kamar (
 -- ================================================================
 CREATE TABLE bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id VARCHAR(20) NOT NULL UNIQUE COMMENT 'Human-readable booking code',
     tenant_id INT NOT NULL,
     kamar_id INT NOT NULL,
     start_date DATE NOT NULL,
@@ -138,6 +141,7 @@ CREATE TABLE bookings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
     FOREIGN KEY (kamar_id) REFERENCES kamar(id) ON DELETE CASCADE,
+    INDEX idx_booking_id (booking_id),
     INDEX idx_tenant_id (tenant_id),
     INDEX idx_kamar_id (kamar_id),
     INDEX idx_status (status),
@@ -159,14 +163,15 @@ CREATE TABLE payments (
     payment_url TEXT DEFAULT NULL,
     snap_token VARCHAR(255) DEFAULT NULL,
     paid_at TIMESTAMP NULL DEFAULT NULL,
-    expired_at TIMESTAMP NULL DEFAULT NULL,
+    expires_at DATETIME NULL DEFAULT NULL,
     midtrans_response TEXT DEFAULT NULL COMMENT 'JSON response from Midtrans',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
     INDEX idx_booking_id (booking_id),
     INDEX idx_midtrans_order_id (midtrans_order_id),
-    INDEX idx_payment_status (payment_status)
+    INDEX idx_payment_status (payment_status),
+    INDEX idx_expires_at (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ================================================================

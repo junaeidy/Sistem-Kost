@@ -97,7 +97,37 @@ class BookingModel extends Model
      */
     public function createBooking($data)
     {
-        return $this->create($data);
+        // Validate required fields
+        $required = ['tenant_id', 'kamar_id', 'start_date', 'duration_months', 'end_date', 'total_price'];
+        foreach ($required as $field) {
+            if (!isset($data[$field]) || empty($data[$field])) {
+                error_log("Booking creation failed: Missing field $field");
+                return false;
+            }
+        }
+        
+        // Generate unique booking_id
+        if (!isset($data['booking_id'])) {
+            $data['booking_id'] = generateUniqueBookingId();
+        }
+        
+        // Ensure status is set
+        if (!isset($data['status'])) {
+            $data['status'] = 'waiting_payment';
+        }
+        
+        // Log the data being inserted
+        error_log("Creating booking with data: " . json_encode($data));
+        
+        $result = $this->create($data);
+        
+        if ($result) {
+            error_log("Booking created successfully with ID: $result, Booking Code: " . $data['booking_id']);
+        } else {
+            error_log("Failed to insert booking into database");
+        }
+        
+        return $result;
     }
 
     /**
@@ -139,16 +169,19 @@ class BookingModel extends Model
             WHERE kamar_id = :kamar_id
             AND status IN ('waiting_payment', 'paid', 'accepted', 'active_rent')
             AND (
-                (start_date BETWEEN :start_date AND :end_date)
-                OR (end_date BETWEEN :start_date AND :end_date)
-                OR (:start_date BETWEEN start_date AND end_date)
+                (start_date BETWEEN :start_date1 AND :end_date1)
+                OR (end_date BETWEEN :start_date2 AND :end_date2)
+                OR (:start_date3 BETWEEN start_date AND end_date)
             )
         ";
 
         $result = $this->fetchOne($query, [
             'kamar_id' => $kamarId,
-            'start_date' => $startDate,
-            'end_date' => $endDate
+            'start_date1' => $startDate,
+            'end_date1' => $endDate,
+            'start_date2' => $startDate,
+            'end_date2' => $endDate,
+            'start_date3' => $startDate
         ]);
 
         return ($result['count'] ?? 0) == 0;
@@ -197,6 +230,9 @@ class BookingModel extends Model
      */
     public function getRecentBookings($tenantId, $limit = 5)
     {
+        // Cast to int for security
+        $limit = (int) $limit;
+        
         $query = "
             SELECT 
                 b.*,
@@ -208,12 +244,28 @@ class BookingModel extends Model
             INNER JOIN kost ko ON k.kost_id = ko.id
             WHERE b.tenant_id = :tenant_id
             ORDER BY b.created_at DESC
-            LIMIT :limit
+            LIMIT {$limit}
         ";
 
         return $this->fetchAll($query, [
-            'tenant_id' => $tenantId,
-            'limit' => $limit
+            'tenant_id' => $tenantId
         ]);
+    }
+    
+    /**
+     * Check if room has active booking
+     * 
+     * @param int $kamarId
+     * @return bool
+     */
+    public function hasActiveBookingForRoom($kamarId)
+    {
+        $query = "SELECT COUNT(*) as count FROM {$this->table} 
+                  WHERE kamar_id = :kamar_id 
+                  AND status IN ('waiting_payment', 'paid', 'accepted', 'active_rent')
+                  LIMIT 1";
+        
+        $result = $this->fetchOne($query, ['kamar_id' => $kamarId]);
+        return ($result['count'] ?? 0) > 0;
     }
 }

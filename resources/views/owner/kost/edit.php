@@ -128,6 +128,9 @@ $facilities = !empty($kost['facilities']) ? json_decode($kost['facilities'], tru
                 </div>
             </div>
 
+            <!-- Map Picker Component -->
+            <?php include __DIR__ . '/../../components/map-picker.php'; ?>
+
             <!-- Submit Buttons -->
             <div class="flex space-x-4">
                 <button type="submit"

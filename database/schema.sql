@@ -73,6 +73,8 @@ CREATE TABLE kost (
     price DECIMAL(10, 2) NOT NULL,
     address TEXT NOT NULL,
     location VARCHAR(255) DEFAULT NULL COMMENT 'Area/kelurahan (e.g., Medan Sunggal)',
+    latitude DECIMAL(10, 8) DEFAULT NULL COMMENT 'Koordinat latitude untuk GIS map',
+    longitude DECIMAL(11, 8) DEFAULT NULL COMMENT 'Koordinat longitude untuk GIS map',
     facilities TEXT DEFAULT NULL COMMENT 'JSON array of facilities',
     description TEXT DEFAULT NULL COMMENT 'HTML content from CKEditor',
     gender_type ENUM('putra', 'putri', 'campur') DEFAULT 'campur',
@@ -82,6 +84,7 @@ CREATE TABLE kost (
     FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE CASCADE,
     INDEX idx_owner_id (owner_id),
     INDEX idx_location (location),
+    INDEX idx_coordinates (latitude, longitude),
     INDEX idx_status (status),
     INDEX idx_price (price)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

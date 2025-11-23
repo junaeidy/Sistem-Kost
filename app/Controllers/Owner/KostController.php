@@ -125,6 +125,8 @@ class KostController extends Controller
         $facilities = $this->post('facilities', []);
         $description = $this->post('description');
         $genderType = $this->post('gender_type', 'campur');
+        $latitude = $this->post('latitude');
+        $longitude = $this->post('longitude');
 
         if (empty($name) || empty($location) || empty($address) || empty($price)) {
             $this->flash('error', 'Semua field wajib diisi.');
@@ -136,14 +138,16 @@ class KostController extends Controller
         $facilitiesJson = !empty($facilities) ? json_encode($facilities) : null;
 
         // Insert kost
-        $query = "INSERT INTO kost (owner_id, name, location, address, price, facilities, description, gender_type, status, created_at, updated_at)
-                  VALUES (:owner_id, :name, :location, :address, :price, :facilities, :description, :gender_type, 'active', NOW(), NOW())";
+        $query = "INSERT INTO kost (owner_id, name, location, address, latitude, longitude, price, facilities, description, gender_type, status, created_at, updated_at)
+                  VALUES (:owner_id, :name, :location, :address, :latitude, :longitude, :price, :facilities, :description, :gender_type, 'active', NOW(), NOW())";
         
         $params = [
             'owner_id' => $ownerId,
             'name' => $name,
             'location' => $location,
             'address' => $address,
+            'latitude' => !empty($latitude) ? $latitude : null,
+            'longitude' => !empty($longitude) ? $longitude : null,
             'price' => $price,
             'facilities' => $facilitiesJson,
             'description' => $description,
@@ -325,6 +329,8 @@ class KostController extends Controller
         $facilities = $this->post('facilities', []);
         $description = $this->post('description');
         $genderType = $this->post('gender_type', 'campur');
+        $latitude = $this->post('latitude');
+        $longitude = $this->post('longitude');
 
         if (empty($name) || empty($location) || empty($address) || empty($price)) {
             $this->flash('error', 'Semua field wajib diisi.');
@@ -340,6 +346,8 @@ class KostController extends Controller
                   name = :name,
                   location = :location,
                   address = :address,
+                  latitude = :latitude,
+                  longitude = :longitude,
                   price = :price,
                   facilities = :facilities,
                   description = :description,
@@ -352,6 +360,8 @@ class KostController extends Controller
             'name' => $name,
             'location' => $location,
             'address' => $address,
+            'latitude' => !empty($latitude) ? $latitude : null,
+            'longitude' => !empty($longitude) ? $longitude : null,
             'price' => $price,
             'facilities' => $facilitiesJson,
             'description' => $description,

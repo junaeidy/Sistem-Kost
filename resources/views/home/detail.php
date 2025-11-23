@@ -232,6 +232,9 @@ $isAuthenticated = isset($_SESSION['user_id']);
                     <?php endif; ?>
                 </div>
 
+                <!-- Map View Component -->
+                <?php include __DIR__ . '/../components/map-view.php'; ?>
+
             </div>
         </div>
 

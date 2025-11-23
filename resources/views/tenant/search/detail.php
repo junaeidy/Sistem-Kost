@@ -97,6 +97,9 @@ $similarKost = $similarKost ?? [];
             <?php endif; ?>
         </div>
 
+        <!-- Map View Component -->
+        <?php include __DIR__ . '/../../components/map-view.php'; ?>
+
         <!-- Available Rooms -->
         <div class="bg-white rounded-lg shadow-md p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4">

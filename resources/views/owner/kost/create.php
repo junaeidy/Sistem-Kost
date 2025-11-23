@@ -130,6 +130,9 @@ $pageTitle = $pageTitle ?? 'Tambah Kost Baru';
                 </div>
             </div>
 
+            <!-- Map Picker Component -->
+            <?php include __DIR__ . '/../../components/map-picker.php'; ?>
+
             <!-- Submit Buttons -->
             <div class="flex space-x-4">
                 <button type="submit"

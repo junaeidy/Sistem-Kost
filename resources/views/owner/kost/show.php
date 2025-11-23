@@ -53,6 +53,11 @@ $facilities = !empty($kost['facilities']) ? json_decode($kost['facilities'], tru
                 </div>
             </div>
 
+            <!-- Map Section -->
+            <div class="mb-4">
+                <?php include __DIR__ . '/../../components/map-view.php'; ?>
+            </div>
+
             <div class="mb-4">
                 <p class="text-sm text-gray-500 mb-1">Alamat Lengkap</p>
                 <p class="text-gray-700"><?= e($kost['address']) ?></p>

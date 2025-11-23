@@ -298,4 +298,51 @@ class KostModel extends Model
         $query = "SELECT * FROM {$this->table} WHERE id = :id AND owner_id = :owner_id LIMIT 1";
         return $this->fetchOne($query, ['id' => $id, 'owner_id' => $ownerId]);
     }
+
+    /**
+     * Update coordinates for a kost
+     * 
+     * @param int $kostId
+     * @param float|null $latitude
+     * @param float|null $longitude
+     * @return bool
+     */
+    public function updateCoordinates($kostId, $latitude, $longitude)
+    {
+        $query = "UPDATE {$this->table} SET latitude = :latitude, longitude = :longitude WHERE id = :id";
+        $stmt = $this->query($query, [
+            'id' => $kostId,
+            'latitude' => $latitude,
+            'longitude' => $longitude
+        ]);
+        return $stmt !== false;
+    }
+
+    /**
+     * Get all kost with valid coordinates (for map clustering)
+     * 
+     * @return array
+     */
+    public function getAllWithCoordinates()
+    {
+        $query = "
+            SELECT 
+                k.id,
+                k.name,
+                k.address,
+                k.latitude,
+                k.longitude,
+                k.gender_type,
+                (SELECT COUNT(*) FROM kamar WHERE kost_id = k.id AND status = 'available') as available_kamar,
+                (SELECT MIN(price) FROM kamar WHERE kost_id = k.id) as min_price,
+                (SELECT photo_url FROM kost_photos WHERE kost_id = k.id AND is_primary = 1 LIMIT 1) as primary_photo
+            FROM {$this->table} k
+            WHERE k.latitude IS NOT NULL 
+            AND k.longitude IS NOT NULL
+            AND k.status = 'active'
+            ORDER BY k.created_at DESC
+        ";
+        return $this->fetchAll($query);
+    }
 }
+

@@ -33,6 +33,9 @@ class TransactionController extends Controller
     public function index()
     {
         $status = $this->get('status', 'all');
+        $page = max(1, (int) $this->get('page', 1));
+        $perPage = max(1, (int) (config('pagination.per_page') ?: 10)); // Fallback to 10 if not set
+        $offset = ($page - 1) * $perPage;
         
         $query = "SELECT 
                     p.*,
@@ -50,13 +53,22 @@ class TransactionController extends Controller
                   LEFT JOIN users u ON t.user_id = u.id";
         
         $params = [];
+        $whereClause = '';
         
         if ($status !== 'all') {
-            $query .= " WHERE p.payment_status = :payment_status";
+            $whereClause = " WHERE p.payment_status = :payment_status";
             $params['payment_status'] = $status;
         }
         
-        $query .= " ORDER BY p.created_at DESC";
+        // Count total
+        $countQuery = "SELECT COUNT(*) as total FROM payments p" . $whereClause;
+        $totalResult = $this->db->fetchOne($countQuery, $params);
+        $total = (int) ($totalResult['total'] ?? 0);
+        
+        // Get paginated results
+        $query .= $whereClause . " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
+        $params['limit'] = $perPage;
+        $params['offset'] = $offset;
 
         $transactions = $this->db->fetchAll($query, $params);
         
@@ -64,6 +76,9 @@ class TransactionController extends Controller
         foreach ($transactions as &$transaction) {
             $transaction['transaction_id'] = $this->generateTransactionId($transaction['id']);
         }
+        
+        // Calculate pagination
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
 
         // Calculate statistics
         $statsQuery = "SELECT 
@@ -80,7 +95,10 @@ class TransactionController extends Controller
             'pageTitle' => 'Kelola Transaksi',
             'transactions' => $transactions,
             'currentStatus' => $status,
-            'stats' => $stats
+            'stats' => $stats,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'total' => $total
         ], 'layouts/dashboard');
     }
 

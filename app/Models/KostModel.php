@@ -60,6 +60,15 @@ class KostModel extends Model
 
         $params = [];
 
+        // Keyword search (q parameter from homepage)
+        if (!empty($filters['q'])) {
+            $query .= " AND (k.name LIKE :keyword OR k.location LIKE :keyword2 OR k.address LIKE :keyword3 OR k.description LIKE :keyword4)";
+            $params['keyword'] = '%' . $filters['q'] . '%';
+            $params['keyword2'] = '%' . $filters['q'] . '%';
+            $params['keyword3'] = '%' . $filters['q'] . '%';
+            $params['keyword4'] = '%' . $filters['q'] . '%';
+        }
+
         // Location filter
         if (!empty($filters['location'])) {
             $query .= " AND (k.location LIKE :location OR k.address LIKE :location2 OR k.name LIKE :location3)";
@@ -68,10 +77,17 @@ class KostModel extends Model
             $params['location3'] = '%' . $filters['location'] . '%';
         }
 
-        // Gender type filter
-        if (!empty($filters['gender_type'])) {
+        // Gender type filter (support both 'gender' and 'gender_type' parameters)
+        $genderFilter = $filters['gender'] ?? $filters['gender_type'] ?? '';
+        if (!empty($genderFilter)) {
             $query .= " AND k.gender_type = :gender_type";
-            $params['gender_type'] = $filters['gender_type'];
+            $params['gender_type'] = $genderFilter;
+        }
+
+        // Facilities filter (check if facilities column contains the facility)
+        if (!empty($filters['facilities'])) {
+            $query .= " AND k.facilities LIKE :facilities";
+            $params['facilities'] = '%' . $filters['facilities'] . '%';
         }
 
         // Having clause for price filter (after aggregation)

@@ -24,30 +24,46 @@ class KostController extends Controller
     public function index()
     {
         $status = $this->get('status', 'all');
+        $page = max(1, (int) $this->get('page', 1));
+        $perPage = max(1, (int) (config('pagination.per_page') ?: 10)); // Fallback to 10 if not set
+        $offset = ($page - 1) * $perPage;
         
         $query = "SELECT k.*, o.name as owner_name, u.email as owner_email
                   FROM kost k
                   LEFT JOIN owners o ON k.owner_id = o.id
                   LEFT JOIN users u ON o.user_id = u.id";
         
-        if ($status !== 'all') {
-            $query .= " WHERE k.status = :status";
-        }
-        
-        $query .= " ORDER BY k.created_at DESC";
-
         $params = [];
+        $whereClause = '';
+        
         if ($status !== 'all') {
+            $whereClause = " WHERE k.status = :status";
             $params['status'] = $status;
         }
+        
+        // Count total
+        $countQuery = "SELECT COUNT(*) as total FROM kost k" . $whereClause;
+        $totalResult = $this->db->fetchOne($countQuery, $params);
+        $total = (int) ($totalResult['total'] ?? 0);
+        
+        // Get paginated results
+        $query .= $whereClause . " ORDER BY k.created_at DESC LIMIT :limit OFFSET :offset";
+        $params['limit'] = $perPage;
+        $params['offset'] = $offset;
 
         $kosts = $this->db->fetchAll($query, $params);
+        
+        // Calculate pagination
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
 
         $this->view('admin/kost/index', [
             'title' => 'Kelola Kost',
             'pageTitle' => 'Kelola Kost',
             'kosts' => $kosts,
-            'currentStatus' => $status
+            'currentStatus' => $status,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'total' => $total
         ], 'layouts/dashboard');
     }
 

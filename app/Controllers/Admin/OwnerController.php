@@ -30,19 +30,48 @@ class OwnerController extends Controller
     public function index()
     {
         $status = $this->get('status', 'all');
+        $page = max(1, (int) $this->get('page', 1));
+        $perPage = max(1, (int) (config('pagination.per_page') ?: 10)); // Fallback to 10 if not set
+        $offset = ($page - 1) * $perPage;
         
-        $filter = [];
+        // Build query
+        $query = "SELECT o.*, u.email, u.status as user_status, u.role, u.created_at as user_created_at
+                  FROM owners o
+                  LEFT JOIN users u ON o.user_id = u.id
+                  WHERE 1=1";
+        
+        $params = [];
         if ($status !== 'all') {
-            $filter['status'] = $status;
+            $query .= " AND u.status = :status";
+            $params['status'] = $status;
         }
-
-        $owners = $this->ownerModel->getAllWithUsers($filter);
+        
+        // Count total
+        $countQuery = "SELECT COUNT(*) as total FROM owners o LEFT JOIN users u ON o.user_id = u.id WHERE 1=1";
+        if ($status !== 'all') {
+            $countQuery .= " AND u.status = :status";
+        }
+        $totalResult = $this->db->fetchOne($countQuery, $params);
+        $total = (int) ($totalResult['total'] ?? 0);
+        
+        // Get paginated results
+        $query .= " ORDER BY o.created_at DESC LIMIT :limit OFFSET :offset";
+        $params['limit'] = $perPage;
+        $params['offset'] = $offset;
+        
+        $owners = $this->db->fetchAll($query, $params);
+        
+        // Calculate pagination
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
 
         $this->view('admin/owners/index', [
             'title' => 'Kelola Owner',
             'pageTitle' => 'Kelola Owner',
             'owners' => $owners,
-            'currentStatus' => $status
+            'currentStatus' => $status,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'total' => $total
         ], 'layouts/dashboard');
     }
 

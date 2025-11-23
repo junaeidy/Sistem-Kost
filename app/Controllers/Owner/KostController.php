@@ -49,20 +49,42 @@ class KostController extends Controller
     {
         $ownerId = $this->getOwnerId();
 
+        // Pagination setup
+        $perPage = max(1, (int) (config('pagination.per_page') ?: 10));
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $offset = ($page - 1) * $perPage;
+
+        // Count total records
+        $countQuery = "SELECT COUNT(*) as total FROM kost WHERE owner_id = :owner_id";
+        $totalResult = $this->db->fetchOne($countQuery, ['owner_id' => $ownerId]);
+        $total = (int) ($totalResult['total'] ?? 0);
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
+
         $query = "SELECT k.*, 
                   (SELECT COUNT(*) FROM kamar WHERE kost_id = k.id) as total_kamar,
                   (SELECT COUNT(*) FROM kamar WHERE kost_id = k.id AND status = 'available') as available_kamar,
                   (SELECT COUNT(*) FROM kamar WHERE kost_id = k.id AND status = 'occupied') as occupied_kamar
                  FROM kost k
                  WHERE k.owner_id = :owner_id
-                 ORDER BY k.created_at DESC";
+                 ORDER BY k.created_at DESC
+                 LIMIT :limit OFFSET :offset";
         
-        $kostList = $this->db->fetchAll($query, ['owner_id' => $ownerId]);
+        $kostList = $this->db->fetchAll($query, [
+            'owner_id' => $ownerId,
+            'limit' => $perPage,
+            'offset' => $offset
+        ]);
 
         $this->view('owner/kost/index', [
             'title' => 'Kelola Kost',
             'pageTitle' => 'Kelola Kost',
-            'kostList' => $kostList
+            'kostList' => $kostList,
+            'pagination' => [
+                'current_page' => $page,
+                'total_pages' => $totalPages,
+                'total_items' => $total,
+                'per_page' => $perPage
+            ]
         ], 'layouts/dashboard');
     }
 

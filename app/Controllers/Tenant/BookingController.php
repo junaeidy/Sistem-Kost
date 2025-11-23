@@ -47,15 +47,30 @@ class BookingController extends Controller
         // Get filter from query string
         $status = $_GET['status'] ?? null;
 
-        // Get bookings
-        $bookings = $this->bookingModel->findByTenantId($tenantId, $status);
+        // Pagination setup
+        $perPage = max(1, (int) (config('pagination.per_page') ?: 10));
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $offset = ($page - 1) * $perPage;
+
+        // Get total count
+        $total = $this->bookingModel->countByTenantId($tenantId, $status);
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
+
+        // Get bookings with pagination
+        $bookings = $this->bookingModel->findByTenantId($tenantId, $status, $perPage, $offset);
 
         $this->view('tenant/booking/index', [
             'title' => 'Daftar Booking Saya',
             'pageTitle' => 'Daftar Booking Saya',
             'tenant' => $tenant,
             'bookings' => $bookings,
-            'currentStatus' => $status
+            'currentStatus' => $status,
+            'pagination' => [
+                'current_page' => $page,
+                'total_pages' => $totalPages,
+                'total_items' => $total,
+                'per_page' => $perPage
+            ]
         ], 'layouts/dashboard');
     }
 

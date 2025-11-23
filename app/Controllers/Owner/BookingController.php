@@ -48,7 +48,38 @@ class BookingController extends Controller
         $status = $_GET['status'] ?? 'all';
         $search = $_GET['search'] ?? '';
 
-        // Build query
+        // Pagination setup
+        $perPage = max(1, (int) (config('pagination.per_page') ?: 10));
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $offset = ($page - 1) * $perPage;
+
+        // Build query for counting
+        $countQuery = "SELECT COUNT(*) as total
+                      FROM bookings b
+                      JOIN tenants t ON b.tenant_id = t.id
+                      JOIN kamar k ON b.kamar_id = k.id
+                      JOIN kost ON k.kost_id = kost.id
+                      WHERE kost.owner_id = :owner_id";
+        
+        $params = ['owner_id' => $ownerId];
+
+        // Apply filters to count query
+        if ($status !== 'all') {
+            $countQuery .= " AND b.status = :status";
+            $params['status'] = $status;
+        }
+
+        if (!empty($search)) {
+            $countQuery .= " AND (t.name LIKE :search OR kost.name LIKE :search OR k.name LIKE :search)";
+            $params['search'] = "%{$search}%";
+        }
+
+        // Get total count
+        $totalResult = $this->db->fetchOne($countQuery, $params);
+        $total = (int) ($totalResult['total'] ?? 0);
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
+
+        // Build query for data
         $query = "SELECT 
                     b.*,
                     b.booking_id,
@@ -66,20 +97,20 @@ class BookingController extends Controller
                   LEFT JOIN payments p ON b.id = p.booking_id
                   WHERE kost.owner_id = :owner_id";
 
-        $params = ['owner_id' => $ownerId];
-
         // Apply filters
         if ($status !== 'all') {
             $query .= " AND b.status = :status";
-            $params['status'] = $status;
         }
 
         if (!empty($search)) {
             $query .= " AND (t.name LIKE :search OR kost.name LIKE :search OR k.name LIKE :search)";
-            $params['search'] = "%{$search}%";
         }
 
-        $query .= " ORDER BY b.created_at DESC";
+        $query .= " ORDER BY b.created_at DESC LIMIT :limit OFFSET :offset";
+
+        // Add pagination params
+        $params['limit'] = $perPage;
+        $params['offset'] = $offset;
 
         $bookings = $this->db->fetchAll($query, $params);
 
@@ -117,7 +148,13 @@ class BookingController extends Controller
             'bookings' => $bookings,
             'statusCounts' => $statusCounts,
             'currentStatus' => $status,
-            'currentSearch' => $search
+            'currentSearch' => $search,
+            'pagination' => [
+                'current_page' => $page,
+                'total_pages' => $totalPages,
+                'total_items' => $total,
+                'per_page' => $perPage
+            ]
         ], 'layouts/dashboard');
     }
 

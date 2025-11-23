@@ -23,8 +23,8 @@
     <div class="flex h-screen overflow-hidden">
         
         <!-- Sidebar -->
-        <aside class="w-64 bg-gray-800 text-white flex-shrink-0">
-            <div class="p-4">
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white flex-shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col">
+            <div class="p-4 flex-shrink-0">
                 <h1 class="text-2xl font-bold">
                     <i class="fas fa-home mr-2"></i>
                     <?= config('app.name') ?>
@@ -40,7 +40,7 @@
                 </p>
             </div>
             
-            <nav class="mt-6">
+            <nav class="mt-6 flex-1 overflow-y-auto pb-24">
                 <?= $sidebarMenu ?? '' ?>
             </nav>
             
@@ -60,31 +60,17 @@
             
             <!-- Top Navigation -->
             <header class="bg-white shadow-md">
-                <div class="flex items-center justify-between px-6 py-4">
-                    <button onclick="toggleSidebar()" class="text-gray-600 lg:hidden">
-                        <i class="fas fa-bars text-2xl"></i>
+                <div class="flex items-center justify-between px-4 md:px-6 py-4">
+                    <button onclick="toggleSidebar()" class="text-gray-600 lg:hidden focus:outline-none">
+                        <i class="fas fa-bars text-xl md:text-2xl"></i>
                     </button>
                     
-                    <h2 class="text-xl font-semibold text-gray-800">
+                    <h2 class="text-lg md:text-xl font-semibold text-gray-800">
                         <?= $pageTitle ?? 'Dashboard' ?>
                     </h2>
                     
-                    <div class="flex items-center space-x-4">
-                        <a href="<?= url('/') ?>" class="text-gray-600 hover:text-blue-600" title="Lihat Website">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                        
-                        <a href="<?= url('/profile') ?>" class="text-gray-600 hover:text-blue-600" title="Profil">
-                            <i class="fas fa-user"></i>
-                        </a>
-                        
-                        <form action="<?= url('/logout') ?>" method="POST" class="inline">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="text-gray-600 hover:text-red-600" title="Logout">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </button>
-                        </form>
-                    </div>
+                    <!-- Spacer for mobile -->
+                    <div class="w-6 lg:hidden"></div>
                 </div>
             </header>
             
@@ -101,7 +87,7 @@
             <?php endif; ?>
             
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
                 <?= $content ?? '' ?>
             </main>
             
@@ -109,13 +95,20 @@
         
     </div>
     
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+    
     <!-- Custom JS -->
     <script>
         function toggleSidebar() {
-            // Implement mobile sidebar toggle
-            const sidebar = document.querySelector('aside');
-            sidebar.classList.toggle('hidden');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
         }
+        
+        // Close sidebar when clicking overlay
+        document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
         
         // Auto-hide flash messages after 5 seconds
         setTimeout(() => {

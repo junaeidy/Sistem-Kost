@@ -120,7 +120,7 @@ $facilities = !empty($kamar['facilities']) ? json_decode($kamar['facilities'], t
                           name="description" 
                           rows="4"
                           placeholder="Informasi tambahan tentang kamar ini..."
-                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"><?= e($kamar['description']) ?></textarea>
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"><?= e($kamar['description'] ?? '') ?></textarea>
             </div>
 
             <!-- Buttons -->

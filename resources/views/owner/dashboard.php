@@ -7,94 +7,94 @@ $owner = $owner ?? [];
 ?>
 
 <!-- Welcome Section -->
-<div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-6 mb-8 text-white">
-    <h2 class="text-2xl font-bold mb-2">Selamat Datang, <?= e($owner['name'] ?? 'Owner') ?>!</h2>
-    <p class="text-blue-100">Kelola properti kost Anda dengan mudah dan efisien</p>
+<div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 text-white">
+    <h2 class="text-xl sm:text-2xl font-bold mb-2">Selamat Datang, <?= e($owner['name'] ?? 'Owner') ?>!</h2>
+    <p class="text-sm sm:text-base text-blue-100">Kelola properti kost Anda dengan mudah dan efisien</p>
 </div>
 
 <!-- Statistics Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
     
     <!-- Total Kost -->
-    <div class="bg-white rounded-lg shadow-md p-6">
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-500 text-sm">Total Kost</p>
-                <h3 class="text-3xl font-bold text-gray-800"><?= $stats['total_kost'] ?? 0 ?></h3>
+                <p class="text-gray-500 text-xs sm:text-sm">Total Kost</p>
+                <h3 class="text-2xl sm:text-3xl font-bold text-gray-800"><?= $stats['total_kost'] ?? 0 ?></h3>
                 <p class="text-xs text-gray-500 mt-1">
                     <?= $stats['total_kamar'] ?? 0 ?> kamar total
                 </p>
             </div>
-            <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-building text-2xl text-purple-600"></i>
+            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-building text-xl sm:text-2xl text-purple-600"></i>
             </div>
         </div>
     </div>
     
     <!-- Available Kamar -->
-    <div class="bg-white rounded-lg shadow-md p-6">
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-500 text-sm">Kamar Tersedia</p>
-                <h3 class="text-3xl font-bold text-gray-800"><?= $stats['available_kamar'] ?? 0 ?></h3>
+                <p class="text-gray-500 text-xs sm:text-sm">Kamar Tersedia</p>
+                <h3 class="text-2xl sm:text-3xl font-bold text-gray-800"><?= $stats['available_kamar'] ?? 0 ?></h3>
                 <p class="text-xs text-gray-500 mt-1">
                     dari <?= $stats['total_kamar'] ?? 0 ?> kamar
                 </p>
             </div>
-            <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-door-open text-2xl text-green-600"></i>
+            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-door-open text-xl sm:text-2xl text-green-600"></i>
             </div>
         </div>
     </div>
     
     <!-- Active Rentals -->
-    <div class="bg-white rounded-lg shadow-md p-6">
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-500 text-sm">Penyewa Aktif</p>
-                <h3 class="text-3xl font-bold text-gray-800"><?= $stats['active_rentals'] ?? 0 ?></h3>
+                <p class="text-gray-500 text-xs sm:text-sm">Penyewa Aktif</p>
+                <h3 class="text-2xl sm:text-3xl font-bold text-gray-800"><?= $stats['active_rentals'] ?? 0 ?></h3>
                 <p class="text-xs text-gray-500 mt-1">
                     <?= $stats['total_bookings'] ?? 0 ?> total booking
                 </p>
             </div>
-            <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-users text-2xl text-blue-600"></i>
+            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-users text-xl sm:text-2xl text-blue-600"></i>
             </div>
         </div>
     </div>
     
     <!-- Total Revenue -->
-    <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-3">
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 sm:col-span-2 lg:col-span-3">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-500 text-sm">Total Pendapatan</p>
-                <h3 class="text-3xl font-bold text-green-600">Rp <?= number_format($stats['total_revenue'] ?? 0, 0, ',', '.') ?></h3>
+                <p class="text-gray-500 text-xs sm:text-sm">Total Pendapatan</p>
+                <h3 class="text-2xl sm:text-3xl font-bold text-green-600">Rp <?= number_format($stats['total_revenue'] ?? 0, 0, ',', '.') ?></h3>
                 <p class="text-xs text-gray-500 mt-1">Dari pembayaran yang berhasil</p>
             </div>
-            <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-money-bill-wave text-2xl text-yellow-600"></i>
+            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-money-bill-wave text-xl sm:text-2xl text-yellow-600"></i>
             </div>
         </div>
     </div>
     
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
     
     <!-- Recent Bookings -->
     <div class="bg-white rounded-lg shadow-md">
-        <div class="p-6 border-b border-gray-200">
+        <div class="p-4 sm:p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-800">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800">
                     <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>
                     Booking Terbaru
                 </h3>
-                <a href="<?= url('/owner/bookings') ?>" class="text-blue-600 hover:text-blue-800 text-sm">
+                <a href="<?= url('/owner/bookings') ?>" class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm">
                     Lihat Semua <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
         </div>
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
             <?php if (empty($recentBookings)): ?>
                 <div class="text-center py-8">
                     <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
@@ -134,18 +134,18 @@ $owner = $owner ?? [];
     
     <!-- Kost List -->
     <div class="bg-white rounded-lg shadow-md">
-        <div class="p-6 border-b border-gray-200">
+        <div class="p-4 sm:p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-800">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800">
                     <i class="fas fa-home text-purple-600 mr-2"></i>
                     Properti Kost Saya
                 </h3>
-                <a href="<?= url('/owner/kost/create') ?>" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 text-sm">
+                <a href="<?= url('/owner/kost/create') ?>" class="bg-blue-600 text-white px-2 sm:px-3 py-1 rounded-lg hover:bg-blue-700 text-xs sm:text-sm">
                     <i class="fas fa-plus mr-1"></i> Tambah
                 </a>
             </div>
         </div>
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
             <?php if (empty($kostList)): ?>
                 <div class="text-center py-8">
                     <i class="fas fa-building text-4xl text-gray-300 mb-3"></i>
@@ -194,31 +194,31 @@ $owner = $owner ?? [];
 </div>
 
 <!-- Quick Actions -->
-<div class="bg-white rounded-lg shadow-md p-6">
-    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+<div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">
         <i class="fas fa-bolt text-yellow-500 mr-2"></i>
         Quick Actions
     </h3>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <a href="<?= url('/owner/kost/create') ?>" 
-           class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition">
-            <i class="fas fa-plus-circle text-3xl text-blue-600 mb-2"></i>
-            <span class="text-sm font-medium text-gray-700">Tambah Kost</span>
+           class="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition">
+            <i class="fas fa-plus-circle text-2xl sm:text-3xl text-blue-600 mb-2"></i>
+            <span class="text-xs sm:text-sm font-medium text-gray-700 text-center">Tambah Kost</span>
         </a>
         <a href="<?= url('/owner/bookings') ?>" 
-           class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition">
-            <i class="fas fa-calendar-check text-3xl text-green-600 mb-2"></i>
-            <span class="text-sm font-medium text-gray-700">Lihat Booking</span>
+           class="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition">
+            <i class="fas fa-calendar-check text-2xl sm:text-3xl text-green-600 mb-2"></i>
+            <span class="text-xs sm:text-sm font-medium text-gray-700 text-center">Lihat Booking</span>
         </a>
         <a href="<?= url('/owner/kost') ?>" 
-           class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition">
-            <i class="fas fa-building text-3xl text-purple-600 mb-2"></i>
-            <span class="text-sm font-medium text-gray-700">Kelola Kost</span>
+           class="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition">
+            <i class="fas fa-building text-2xl sm:text-3xl text-purple-600 mb-2"></i>
+            <span class="text-xs sm:text-sm font-medium text-gray-700 text-center">Kelola Kost</span>
         </a>
         <a href="<?= url('/owner/profile') ?>" 
-           class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition">
-            <i class="fas fa-user-cog text-3xl text-orange-600 mb-2"></i>
-            <span class="text-sm font-medium text-gray-700">Profil Saya</span>
+           class="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition">
+            <i class="fas fa-user-cog text-2xl sm:text-3xl text-orange-600 mb-2"></i>
+            <span class="text-xs sm:text-sm font-medium text-gray-700 text-center">Profil Saya</span>
         </a>
     </div>
 </div>

@@ -25,6 +25,11 @@ $router->get('/', 'HomeController@index');
 $router->get('/search', 'HomeController@search');
 $router->get('/kost/{id}', 'HomeController@detail');
 
+// Static Pages
+$router->get('/privacy-policy', 'PagesController@privacyPolicy');
+$router->get('/terms-conditions', 'PagesController@termsConditions');
+$router->get('/faq', 'PagesController@faq');
+
 // ================================================================
 // AUTHENTICATION ROUTES (Guest only)
 // ================================================================

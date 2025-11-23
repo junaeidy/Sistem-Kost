@@ -16,16 +16,16 @@ $isSearching = $isSearching ?? false;
 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
     <form method="GET" action="<?= url('/tenant/search') ?>" class="space-y-4">
         
-        <!-- Search by Location -->
+        <!-- Search by Location/Keyword -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="fas fa-map-marker-alt mr-1"></i> Lokasi
+                    <i class="fas fa-search mr-1"></i> Kata Kunci
                 </label>
                 <input type="text" 
-                       name="location" 
-                       value="<?= e($filters['location'] ?? '') ?>"
-                       placeholder="Cari berdasarkan lokasi..."
+                       name="q" 
+                       value="<?= e($filters['q'] ?? $_GET['q'] ?? '') ?>"
+                       placeholder="Cari kost..."
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
 
@@ -33,12 +33,12 @@ $isSearching = $isSearching ?? false;
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     <i class="fas fa-venus-mars mr-1"></i> Tipe Gender
                 </label>
-                <select name="gender_type" 
+                <select name="gender" 
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">Semua Tipe</option>
-                    <option value="putra" <?= ($filters['gender_type'] ?? '') === 'putra' ? 'selected' : '' ?>>Putra</option>
-                    <option value="putri" <?= ($filters['gender_type'] ?? '') === 'putri' ? 'selected' : '' ?>>Putri</option>
-                    <option value="campur" <?= ($filters['gender_type'] ?? '') === 'campur' ? 'selected' : '' ?>>Campur</option>
+                    <option value="putra" <?= ($filters['gender'] ?? $_GET['gender'] ?? '') === 'putra' ? 'selected' : '' ?>>Putra</option>
+                    <option value="putri" <?= ($filters['gender'] ?? $_GET['gender'] ?? '') === 'putri' ? 'selected' : '' ?>>Putri</option>
+                    <option value="campur" <?= ($filters['gender'] ?? $_GET['gender'] ?? '') === 'campur' ? 'selected' : '' ?>>Campur</option>
                 </select>
             </div>
 
@@ -55,28 +55,51 @@ $isSearching = $isSearching ?? false;
             </div>
         </div>
 
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-map-marker-alt mr-1"></i> Lokasi
+                </label>
+                <input type="text" 
+                       name="location" 
+                       value="<?= e($filters['location'] ?? $_GET['location'] ?? '') ?>"
+                       placeholder="Cari berdasarkan lokasi..."
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+        </div>
+
         <!-- Price Range -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="fas fa-money-bill-wave mr-1"></i> Harga Minimum
+                    <i class="fas fa-money-bill-wave mr-1"></i> Range Harga
                 </label>
-                <input type="number" 
-                       name="min_price" 
-                       value="<?= e($filters['min_price'] ?? '') ?>"
-                       placeholder="Rp 0"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select name="price" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <?php 
+                    $priceFilter = $filters['price'] ?? $_GET['price'] ?? '';
+                    ?>
+                    <option value="">Semua Harga</option>
+                    <option value="0-500000" <?= $priceFilter === '0-500000' ? 'selected' : '' ?>>&lt; 500rb</option>
+                    <option value="500000-1000000" <?= $priceFilter === '500000-1000000' ? 'selected' : '' ?>>500rb - 1jt</option>
+                    <option value="1000000-2000000" <?= $priceFilter === '1000000-2000000' ? 'selected' : '' ?>>1jt - 2jt</option>
+                    <option value="2000000-9999999" <?= $priceFilter === '2000000-9999999' ? 'selected' : '' ?>>&gt; 2jt</option>
+                </select>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="fas fa-money-bill-wave mr-1"></i> Harga Maksimum
+                    <i class="fas fa-wifi mr-1"></i> Fasilitas
                 </label>
-                <input type="number" 
-                       name="max_price" 
-                       value="<?= e($filters['max_price'] ?? '') ?>"
-                       placeholder="Rp 999999999"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select name="facilities" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <?php 
+                    $facilitiesFilter = $filters['facilities'] ?? $_GET['facilities'] ?? '';
+                    ?>
+                    <option value="">Semua Fasilitas</option>
+                    <option value="wifi" <?= $facilitiesFilter === 'wifi' ? 'selected' : '' ?>>WiFi</option>
+                    <option value="ac" <?= $facilitiesFilter === 'ac' ? 'selected' : '' ?>>AC</option>
+                    <option value="kamar-mandi-dalam" <?= $facilitiesFilter === 'kamar-mandi-dalam' ? 'selected' : '' ?>>K. Mandi Dalam</option>
+                </select>
             </div>
         </div>
 
@@ -163,11 +186,18 @@ $isSearching = $isSearching ?? false;
 
                 <div class="flex items-center justify-between mb-3">
                     <div>
-                        <p class="text-sm text-gray-500">Mulai dari</p>
-                        <p class="text-xl font-bold text-blue-600">
-                            Rp <?= number_format($kost['min_price'] ?? 0, 0, ',', '.') ?>
-                        </p>
-                        <p class="text-xs text-gray-500">/bulan</p>
+                        <?php if (!empty($kost['min_price']) && $kost['min_price'] > 0): ?>
+                            <p class="text-sm text-gray-500">Mulai dari</p>
+                            <p class="text-xl font-bold text-blue-600">
+                                Rp <?= number_format($kost['min_price'], 0, ',', '.') ?>
+                            </p>
+                            <p class="text-xs text-gray-500">/bulan</p>
+                        <?php else: ?>
+                            <p class="text-sm text-gray-500">Harga</p>
+                            <p class="text-lg font-semibold text-gray-400">
+                                Belum Tersedia
+                            </p>
+                        <?php endif; ?>
                     </div>
                     <div class="text-right">
                         <p class="text-sm text-gray-600">

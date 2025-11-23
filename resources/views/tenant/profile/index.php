@@ -7,26 +7,28 @@ $tenant = $tenant ?? [];
 <div class="max-w-5xl mx-auto">
     <!-- Header -->
     <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Profil Saya</h2>
-        <p class="text-gray-600 mt-1">Kelola informasi profil dan keamanan akun Anda</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Profil Saya</h1>
+        <p class="text-gray-600 mt-2">Kelola informasi profil dan keamanan akun Anda</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Profile Photo Card -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">Foto Profil</h3>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-green-600 to-teal-600 px-6 py-4">
+                    <h3 class="text-lg font-bold text-white">Foto Profil</h3>
+                </div>
                 
-                <div class="flex flex-col items-center">
+                <div class="flex flex-col items-center p-6">
                     <?php if (!empty($tenant['profile_photo'])): ?>
                         <img src="<?= asset($tenant['profile_photo']) ?>" 
                              alt="Profile Photo" 
-                             class="w-32 h-32 rounded-full object-cover border-4 border-blue-100 mb-4 cursor-pointer hover:opacity-90 transition"
+                             class="w-32 h-32 rounded-full object-cover border-4 border-green-100 mb-4 cursor-pointer hover:opacity-90 transition"
                              onclick="window.open(this.src, '_blank')">
                     <?php else: ?>
                         <img src="https://placehold.co/200x200?text=No+Image" 
                              alt="No Profile Photo" 
-                             class="w-32 h-32 rounded-full object-cover border-4 border-blue-100 mb-4">
+                             class="w-32 h-32 rounded-full object-cover border-4 border-green-100 mb-4">
                     <?php endif; ?>
 
                     <p class="text-center font-semibold text-gray-800 mb-1"><?= e($tenant['name'] ?? 'Tenant') ?></p>
@@ -44,7 +46,7 @@ $tenant = $tenant ?? [];
             </div>
 
             <!-- Stats Card -->
-            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md p-6 mt-6 text-white">
+            <div class="bg-gradient-to-br from-green-600 to-teal-600 rounded-lg shadow-lg p-6 mt-6 text-white">
                 <div class="flex items-center mb-2">
                     <i class="fas fa-user text-2xl mr-3"></i>
                     <div>
@@ -52,12 +54,12 @@ $tenant = $tenant ?? [];
                         <p class="font-bold text-lg">Tenant</p>
                     </div>
                 </div>
-                <div class="border-t border-blue-400 opacity-50 my-3"></div>
+                <div class="border-t border-green-400 opacity-50 my-3"></div>
                 <div class="text-sm">
                     <p class="opacity-90">Status Akun</p>
                     <p class="font-semibold"><?= ucfirst($user['status'] ?? 'active') ?></p>
                 </div>
-                <div class="border-t border-blue-400 opacity-50 my-3"></div>
+                <div class="border-t border-green-400 opacity-50 my-3"></div>
                 <div class="text-sm">
                     <p class="opacity-90">Bergabung sejak</p>
                     <p class="font-semibold"><?= date('d F Y', strtotime($tenant['created_at'] ?? 'now')) ?></p>
@@ -68,13 +70,15 @@ $tenant = $tenant ?? [];
         <!-- Forms -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Update Profile Form -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-user-edit text-blue-600 mr-2"></i>
-                    Informasi Profil
-                </h3>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-green-600 to-teal-600 px-6 py-4">
+                    <h3 class="text-lg font-bold text-white flex items-center">
+                        <i class="fas fa-user-edit mr-3"></i>
+                        Informasi Profil
+                    </h3>
+                </div>
 
-                <form action="<?= url('/tenant/profile/update') ?>" method="POST" enctype="multipart/form-data">
+                <form action="<?= url('/tenant/profile/update') ?>" method="POST" enctype="multipart/form-data" class="p-6">
                     <?= csrf_field() ?>
 
                     <!-- Name -->
@@ -87,7 +91,7 @@ $tenant = $tenant ?? [];
                                name="name" 
                                required
                                value="<?= e($tenant['name'] ?? '') ?>"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     </div>
 
                     <!-- Email (readonly) -->
@@ -114,7 +118,7 @@ $tenant = $tenant ?? [];
                                required
                                value="<?= e($tenant['phone'] ?? '') ?>"
                                placeholder="08xxxxxxxxxx"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     </div>
 
                     <!-- Address -->
@@ -126,7 +130,7 @@ $tenant = $tenant ?? [];
                                   name="address" 
                                   rows="3"
                                   placeholder="Alamat lengkap..."
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"><?= e($tenant['address'] ?? '') ?></textarea>
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"><?= e($tenant['address'] ?? '') ?></textarea>
                     </div>
 
                     <!-- Profile Photo Upload -->
@@ -138,12 +142,12 @@ $tenant = $tenant ?? [];
                                id="profile_photo" 
                                name="profile_photo" 
                                accept="image/*"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                         <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, GIF. Maksimal 2MB</p>
                     </div>
 
                     <button type="submit" 
-                            class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                            class="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold shadow-md hover:shadow-lg">
                         <i class="fas fa-save mr-2"></i>
                         Simpan Perubahan
                     </button>
@@ -151,13 +155,15 @@ $tenant = $tenant ?? [];
             </div>
 
             <!-- Change Password Form -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-lock text-blue-600 mr-2"></i>
-                    Ganti Password
-                </h3>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-green-600 to-teal-600 px-6 py-4">
+                    <h3 class="text-lg font-bold text-white flex items-center">
+                        <i class="fas fa-lock mr-3"></i>
+                        Ganti Password
+                    </h3>
+                </div>
 
-                <form action="<?= url('/tenant/profile/update-password') ?>" method="POST">
+                <form action="<?= url('/tenant/profile/update-password') ?>" method="POST" class="p-6">
                     <?= csrf_field() ?>
                     <!-- Current Password -->
                     <div class="mb-4">
@@ -168,7 +174,7 @@ $tenant = $tenant ?? [];
                                id="current_password" 
                                name="current_password" 
                                required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     </div>
 
                     <!-- New Password -->
@@ -181,7 +187,7 @@ $tenant = $tenant ?? [];
                                name="new_password" 
                                required
                                minlength="6"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                         <p class="text-xs text-gray-500 mt-1">Minimal 6 karakter</p>
                     </div>
 
@@ -194,11 +200,11 @@ $tenant = $tenant ?? [];
                                id="confirm_password" 
                                name="confirm_password" 
                                required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     </div>
 
                     <button type="submit" 
-                            class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                            class="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold shadow-md hover:shadow-lg">
                         <i class="fas fa-key mr-2"></i>
                         Update Password
                     </button>

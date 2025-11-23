@@ -5,23 +5,23 @@ $kosts = $kosts ?? [];
 ?>
 
 <!-- Owner Info Card -->
-<div class="bg-white rounded-lg shadow-md p-6 mb-6">
-    <div class="flex items-start justify-between mb-6">
-        <div class="flex items-start">
-            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mr-6 overflow-hidden">
+<div class="bg-white rounded-lg shadow-md p-4 md:p-6 mb-4 md:mb-6">
+    <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 md:mb-6 gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+            <div class="w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 mx-auto sm:mx-0">
                 <?php if (!empty($owner['profile_photo'])): ?>
                     <img src="<?= asset($owner['profile_photo']) ?>" 
                          alt="Profile Photo" 
                          class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition"
                          onclick="window.open(this.src, '_blank')">
                 <?php else: ?>
-                    <i class="fas fa-user text-4xl text-blue-600"></i>
+                    <i class="fas fa-user text-3xl md:text-4xl text-blue-600"></i>
                 <?php endif; ?>
             </div>
-            <div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2"><?= e($owner['name']) ?></h2>
-                <div class="space-y-1">
-                    <p class="text-gray-600">
+            <div class="text-center sm:text-left">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2"><?= e($owner['name']) ?></h2>
+                <div class="space-y-1 text-sm md:text-base">
+                    <p class="text-gray-600 truncate">
                         <i class="fas fa-envelope mr-2"></i><?= e($owner['email']) ?>
                     </p>
                     <p class="text-gray-600">
@@ -37,8 +37,8 @@ $kosts = $kosts ?? [];
             </div>
         </div>
         
-        <div>
-            <span class="px-4 py-2 text-sm font-medium rounded-full
+        <div class="text-center md:text-right">
+            <span class="inline-block px-3 md:px-4 py-2 text-xs md:text-sm font-medium rounded-full
                 <?= $owner['status'] === 'active' ? 'bg-green-100 text-green-800' : 
                     ($owner['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
                     ($owner['status'] === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')) ?>">
@@ -48,21 +48,21 @@ $kosts = $kosts ?? [];
     </div>
 
     <!-- Photos Grid -->
-    <div class="mb-6">
+    <div class="mb-4 md:mb-6">
         <!-- KTP Photo -->
-        <h3 class="text-lg font-semibold text-gray-800 mb-3">
+        <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3">
             <i class="fas fa-id-card mr-2"></i>Foto KTP
         </h3>
-        <div class="max-w-md rounded-lg border border-gray-300 overflow-hidden shadow-sm">
+        <div class="max-w-full md:max-w-md rounded-lg border border-gray-300 overflow-hidden shadow-sm">
             <?php if (!empty($owner['ktp_photo'])): ?>
                 <img src="<?= url('uploads/ktp/' . $owner['ktp_photo']) ?>" 
                      alt="KTP" 
-                     class="w-full h-64 object-cover cursor-pointer hover:opacity-90 transition"
+                     class="w-full h-48 md:h-64 object-cover cursor-pointer hover:opacity-90 transition"
                      onclick="window.open(this.src, '_blank')">
             <?php else: ?>
                 <img src="https://placehold.co/600x400?text=No+Image" 
                      alt="No KTP Image" 
-                     class="w-full h-64 object-cover">
+                     class="w-full h-48 md:h-64 object-cover">
             <?php endif; ?>
         </div>
         <p class="text-xs text-gray-500 mt-2">
@@ -71,28 +71,28 @@ $kosts = $kosts ?? [];
     </div>
 
     <!-- Action Buttons -->
-    <div class="border-t border-gray-200 pt-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Aksi</h3>
-        <div class="flex flex-wrap gap-3">
+    <div class="border-t border-gray-200 pt-4 md:pt-6">
+        <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Aksi</h3>
+        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-2 md:gap-3">
             
             <?php if ($owner['status'] === 'pending'): ?>
                 <!-- Approve Button -->
                 <form action="<?= url('/admin/owners/' . $owner['id'] . '/approve') ?>" method="POST" 
                       onsubmit="return confirm('Apakah Anda yakin ingin menyetujui owner ini?')">
                     <?= csrf_field() ?>
-                    <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <button type="submit" class="w-full sm:w-auto px-4 md:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm md:text-base">
                         <i class="fas fa-check mr-2"></i>Setujui
                     </button>
                 </form>
                 
                 <!-- Reject Button -->
-                <button onclick="showRejectModal()" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                <button onclick="showRejectModal()" class="w-full sm:w-auto px-4 md:px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm md:text-base">
                     <i class="fas fa-times mr-2"></i>Tolak
                 </button>
                 
             <?php elseif ($owner['status'] === 'active'): ?>
                 <!-- Suspend Button -->
-                <button onclick="showSuspendModal()" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+                <button onclick="showSuspendModal()" class="w-full sm:w-auto px-4 md:px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm md:text-base">
                     <i class="fas fa-ban mr-2"></i>Suspend
                 </button>
                 
@@ -101,13 +101,13 @@ $kosts = $kosts ?? [];
                 <form action="<?= url('/admin/owners/' . $owner['id'] . '/activate') ?>" method="POST"
                       onsubmit="return confirm('Apakah Anda yakin ingin mengaktifkan kembali owner ini?')">
                     <?= csrf_field() ?>
-                    <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <button type="submit" class="w-full sm:w-auto px-4 md:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm md:text-base">
                         <i class="fas fa-check mr-2"></i>Aktifkan Kembali
                     </button>
                 </form>
             <?php endif; ?>
             
-            <a href="<?= url('/admin/owners') ?>" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+            <a href="<?= url('/admin/owners') ?>" class="w-full sm:w-auto text-center px-4 md:px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-sm md:text-base">
                 <i class="fas fa-arrow-left mr-2"></i>Kembali
             </a>
         </div>
@@ -115,31 +115,31 @@ $kosts = $kosts ?? [];
 </div>
 
 <!-- Owner's Kost -->
-<div class="bg-white rounded-lg shadow-md p-6">
-    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+<div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+    <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-4">
         <i class="fas fa-building mr-2"></i>Daftar Kost (<?= count($kosts) ?>)
     </h3>
     
     <?php if (empty($kosts)): ?>
-        <p class="text-gray-500 text-center py-8">Owner belum memiliki kost</p>
+        <p class="text-gray-500 text-center py-8 text-sm md:text-base">Owner belum memiliki kost</p>
     <?php else: ?>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             <?php foreach ($kosts as $kost): ?>
-                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                    <h4 class="font-semibold text-gray-800 mb-2"><?= e($kost['name']) ?></h4>
-                    <p class="text-sm text-gray-600 mb-2">
+                <div class="border border-gray-200 rounded-lg p-3 md:p-4 hover:shadow-md transition">
+                    <h4 class="font-semibold text-gray-800 mb-2 text-sm md:text-base truncate"><?= e($kost['name']) ?></h4>
+                    <p class="text-xs md:text-sm text-gray-600 mb-2 truncate">
                         <i class="fas fa-map-marker-alt mr-1"></i><?= e($kost['location']) ?>
                     </p>
-                    <p class="text-lg font-bold text-blue-600 mb-2">
+                    <p class="text-base md:text-lg font-bold text-blue-600 mb-2">
                         Rp <?= number_format($kost['price'], 0, ',', '.') ?>/bulan
                     </p>
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between gap-2">
                         <span class="px-2 py-1 text-xs rounded-full
                             <?= $kost['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' ?>">
                             <?= ucfirst($kost['status']) ?>
                         </span>
                         <a href="<?= url('/admin/kost/' . $kost['id']) ?>" 
-                           class="text-blue-600 hover:text-blue-800 text-sm">
+                           class="text-blue-600 hover:text-blue-800 text-xs md:text-sm whitespace-nowrap">
                             Detail <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>

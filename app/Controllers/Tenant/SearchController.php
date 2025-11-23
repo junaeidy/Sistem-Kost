@@ -36,12 +36,29 @@ class SearchController extends Controller
             return;
         }
 
-        // Get filters from query string
+        // Get filters from query string (support both homepage and search page parameters)
+        $q = $_GET['q'] ?? ''; // Keyword from homepage
+        $gender = $_GET['gender'] ?? ''; // Gender from homepage
+        $price = $_GET['price'] ?? ''; // Price range from homepage (e.g., "500000-1000000")
+        $location = $_GET['location'] ?? ''; // Location
+        $facilities = $_GET['facilities'] ?? ''; // Facilities from homepage
+        
+        // Parse price range if exists
+        $minPrice = '';
+        $maxPrice = '';
+        if (!empty($price) && strpos($price, '-') !== false) {
+            list($minPrice, $maxPrice) = explode('-', $price);
+        }
+        
         $filters = [
-            'location' => $_GET['location'] ?? '',
-            'gender_type' => $_GET['gender_type'] ?? '',
-            'min_price' => $_GET['min_price'] ?? '',
-            'max_price' => $_GET['max_price'] ?? '',
+            'q' => $q,
+            'location' => $location,
+            'gender' => $gender,
+            'gender_type' => $gender, // Alias for compatibility
+            'price' => $price,
+            'min_price' => $minPrice,
+            'max_price' => $maxPrice,
+            'facilities' => $facilities,
             'sort_by' => $_GET['sort_by'] ?? 'created_at',
             'sort_order' => $_GET['sort_order'] ?? 'DESC',
             'available_only' => isset($_GET['available_only']) ? true : false
@@ -52,8 +69,8 @@ class SearchController extends Controller
         $isSearching = false;
 
         // If any filter is applied, perform search
-        if (!empty($filters['location']) || !empty($filters['gender_type']) || 
-            !empty($filters['min_price']) || !empty($filters['max_price'])) {
+        if (!empty($filters['q']) || !empty($filters['location']) || !empty($filters['gender']) || 
+            !empty($filters['price']) || !empty($filters['facilities'])) {
             $isSearching = true;
             $kostList = $this->kostModel->search($filters);
         } else {

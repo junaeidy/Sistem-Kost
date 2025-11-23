@@ -88,7 +88,7 @@ class DashboardController extends Controller
                         JOIN bookings b ON p.booking_id = b.id
                         JOIN kamar ka ON b.kamar_id = ka.id
                         JOIN kost k ON ka.kost_id = k.id
-                        WHERE k.owner_id = :owner_id AND p.payment_status = 'success'";
+                        WHERE k.owner_id = :owner_id AND p.payment_status = 'paid'";
         $revenueResult = $this->db->fetchOne($revenueQuery, ['owner_id' => $ownerId]);
         $stats['total_revenue'] = $revenueResult['total'] ?? 0;
 

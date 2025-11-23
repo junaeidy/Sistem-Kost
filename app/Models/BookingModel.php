@@ -17,9 +17,11 @@ class BookingModel extends Model
      * 
      * @param int $tenantId
      * @param string|null $status Filter by status
+     * @param int $limit Limit number of results
+     * @param int $offset Offset for pagination
      * @return array
      */
-    public function findByTenantId($tenantId, $status = null)
+    public function findByTenantId($tenantId, $status = null, $limit = null, $offset = 0)
     {
         $query = "
             SELECT 
@@ -47,7 +49,34 @@ class BookingModel extends Model
 
         $query .= " ORDER BY b.created_at DESC";
 
+        if ($limit !== null) {
+            $query .= " LIMIT :limit OFFSET :offset";
+            $params['limit'] = $limit;
+            $params['offset'] = $offset;
+        }
+
         return $this->fetchAll($query, $params);
+    }
+
+    /**
+     * Count bookings by tenant ID
+     * 
+     * @param int $tenantId
+     * @param string|null $status Filter by status
+     * @return int
+     */
+    public function countByTenantId($tenantId, $status = null)
+    {
+        $query = "SELECT COUNT(*) as total FROM {$this->table} WHERE tenant_id = :tenant_id";
+        $params = ['tenant_id' => $tenantId];
+
+        if ($status) {
+            $query .= " AND status = :status";
+            $params['status'] = $status;
+        }
+
+        $result = $this->fetchOne($query, $params);
+        return (int) ($result['total'] ?? 0);
     }
 
     /**

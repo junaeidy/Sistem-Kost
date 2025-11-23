@@ -27,7 +27,7 @@
                 </h1>
                 
                 <p class="text-xl text-gray-600 mb-6">
-                    Selamat datang di Sistem Kost! Akun Anda sedang dalam proses verifikasi.
+                    Selamat datang, <strong><?= $_SESSION['user_name'] ?? 'Owner' ?></strong>! Akun Anda sedang dalam proses verifikasi.
                 </p>
                 
                 <!-- Message -->

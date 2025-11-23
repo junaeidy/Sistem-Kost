@@ -55,7 +55,7 @@ $kosts = $kosts ?? [];
         </h3>
         <div class="max-w-md rounded-lg border border-gray-300 overflow-hidden shadow-sm">
             <?php if (!empty($owner['ktp_photo'])): ?>
-                <img src="<?= asset($owner['ktp_photo']) ?>" 
+                <img src="<?= url('uploads/ktp/' . $owner['ktp_photo']) ?>" 
                      alt="KTP" 
                      class="w-full h-64 object-cover cursor-pointer hover:opacity-90 transition"
                      onclick="window.open(this.src, '_blank')">

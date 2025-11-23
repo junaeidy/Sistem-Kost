@@ -182,4 +182,104 @@ class KostModel extends Model
 
         return $this->fetchOne($query) ?: [];
     }
+
+    /**
+     * Get all photos for a kost
+     * 
+     * @param int $kostId
+     * @return array
+     */
+    public function getPhotos($kostId)
+    {
+        $query = "SELECT * FROM kost_photos WHERE kost_id = :kost_id ORDER BY is_primary DESC, display_order ASC";
+        return $this->fetchAll($query, ['kost_id' => $kostId]);
+    }
+
+    /**
+     * Get a photo by ID
+     * 
+     * @param int $photoId
+     * @return array|false
+     */
+    public function getPhotoById($photoId)
+    {
+        $query = "SELECT * FROM kost_photos WHERE id = :id LIMIT 1";
+        return $this->fetchOne($query, ['id' => $photoId]);
+    }
+
+    /**
+     * Add a new photo
+     * 
+     * @param array $data
+     * @return bool|int
+     */
+    public function addPhoto($data)
+    {
+        $query = "
+            INSERT INTO kost_photos (kost_id, photo_url, is_primary, display_order)
+            VALUES (:kost_id, :photo_url, :is_primary, :display_order)
+        ";
+
+        $stmt = $this->query($query, $data);
+        return $stmt ? $this->db->getConnection()->lastInsertId() : false;
+    }
+
+    /**
+     * Set a photo as primary (and unset others)
+     * 
+     * @param int $photoId
+     * @param int $kostId
+     * @return bool
+     */
+    public function setPrimaryPhoto($photoId, $kostId)
+    {
+        // First, unset all primary flags for this kost
+        $query1 = "UPDATE kost_photos SET is_primary = 0 WHERE kost_id = :kost_id";
+        $this->query($query1, ['kost_id' => $kostId]);
+
+        // Then set the selected photo as primary
+        $query2 = "UPDATE kost_photos SET is_primary = 1 WHERE id = :id";
+        $stmt = $this->query($query2, ['id' => $photoId]);
+        return $stmt !== false;
+    }
+
+    /**
+     * Delete a photo
+     * 
+     * @param int $photoId
+     * @return bool
+     */
+    public function deletePhoto($photoId)
+    {
+        $query = "DELETE FROM kost_photos WHERE id = :id";
+        $stmt = $this->query($query, ['id' => $photoId]);
+        return $stmt !== false;
+    }
+
+    /**
+     * Update photo display order
+     * 
+     * @param int $photoId
+     * @param int $order
+     * @return bool
+     */
+    public function updatePhotoOrder($photoId, $order)
+    {
+        $query = "UPDATE kost_photos SET display_order = :order WHERE id = :id";
+        $stmt = $this->query($query, ['id' => $photoId, 'order' => $order]);
+        return $stmt !== false;
+    }
+
+    /**
+     * Find kost by ID and owner (for ownership verification)
+     * 
+     * @param int $id
+     * @param int $ownerId
+     * @return array|false
+     */
+    public function findByIdAndOwner($id, $ownerId)
+    {
+        $query = "SELECT * FROM {$this->table} WHERE id = :id AND owner_id = :owner_id LIMIT 1";
+        return $this->fetchOne($query, ['id' => $id, 'owner_id' => $ownerId]);
+    }
 }

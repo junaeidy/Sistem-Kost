@@ -23,6 +23,9 @@ class ProfileController extends Controller
         $this->db = Database::getInstance();
         $this->ownerModel = new OwnerModel();
         $this->userModel = new UserModel();
+        
+        // Load upload helper
+        require_once __DIR__ . '/../../../helpers/upload.php';
     }
 
     /**
@@ -96,42 +99,19 @@ class ProfileController extends Controller
         // Handle profile photo upload
         $profilePhoto = null;
         if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../../public/uploads/profile/';
-            
-            // Create directory if not exists
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
+            $allowedTypes = getAllowedImageTypes();
+            $result = uploadFile($_FILES['profile_photo'], 'uploads/profile', $allowedTypes, 2048);
 
-            $fileExtension = strtolower(pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION));
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-
-            if (!in_array($fileExtension, $allowedExtensions)) {
-                $this->flash('error', 'Format foto tidak valid. Gunakan JPG, PNG, atau GIF.');
-                $this->back();
-                return;
-            }
-
-            // Check file size (max 2MB)
-            if ($_FILES['profile_photo']['size'] > 2097152) {
-                $this->flash('error', 'Ukuran foto maksimal 2MB.');
-                $this->back();
-                return;
-            }
-
-            $fileName = 'profile_' . $ownerId . '_' . time() . '.' . $fileExtension;
-            $uploadPath = $uploadDir . $fileName;
-
-            if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadPath)) {
-                $profilePhoto = 'uploads/profile/' . $fileName;
+            if ($result['success']) {
+                $profilePhoto = $result['file_path'];
 
                 // Delete old photo
                 $oldOwner = $this->db->fetchOne("SELECT profile_photo FROM owners WHERE id = :id", ['id' => $ownerId]);
-                if (!empty($oldOwner['profile_photo']) && file_exists(__DIR__ . '/../../../public/' . $oldOwner['profile_photo'])) {
-                    unlink(__DIR__ . '/../../../public/' . $oldOwner['profile_photo']);
+                if (!empty($oldOwner['profile_photo'])) {
+                    deleteFile($oldOwner['profile_photo']);
                 }
             } else {
-                $this->flash('error', 'Gagal mengupload foto.');
+                $this->flash('error', $result['message']);
                 $this->back();
                 return;
             }
@@ -261,10 +241,7 @@ class ProfileController extends Controller
         }
 
         // Delete file
-        $filePath = __DIR__ . '/../../../public/' . $owner['profile_photo'];
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
+        deleteFile($owner['profile_photo']);
 
         // Update database
         $query = "UPDATE owners SET profile_photo = NULL, updated_at = NOW() WHERE id = :id";

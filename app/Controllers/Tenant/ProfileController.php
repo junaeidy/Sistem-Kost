@@ -23,6 +23,9 @@ class ProfileController extends Controller
         $this->db = Database::getInstance();
         $this->tenantModel = new TenantModel();
         $this->userModel = new UserModel();
+        
+        // Load upload helper
+        require_once __DIR__ . '/../../../helpers/upload.php';
     }
 
     /**
@@ -114,43 +117,20 @@ class ProfileController extends Controller
         $profilePhoto = $tenant['profile_photo'];
         
         if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
-            $file = $_FILES['profile_photo'];
-            
-            // Validate file
-            $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            $maxSize = 2 * 1024 * 1024; // 2MB
+            $allowedTypes = getAllowedImageTypes();
+            $result = uploadFile($_FILES['profile_photo'], 'uploads/profile', $allowedTypes, 2048);
 
-            if (!in_array($file['type'], $allowedTypes)) {
-                $this->flash('error', 'Tipe file tidak diizinkan. Hanya JPG, PNG, dan GIF.');
-                $this->redirect(url('/tenant/profile'));
-                return;
-            }
-
-            if ($file['size'] > $maxSize) {
-                $this->flash('error', 'Ukuran file maksimal 2MB.');
-                $this->redirect(url('/tenant/profile'));
-                return;
-            }
-
-            // Delete old photo if exists
-            if ($profilePhoto && file_exists($profilePhoto)) {
-                unlink($profilePhoto);
-            }
-
-            // Upload new photo
-            $uploadDir = 'public/uploads/profile/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $filename = 'tenant_' . $tenant['id'] . '_' . time() . '.' . $extension;
-            $destination = $uploadDir . $filename;
-
-            if (move_uploaded_file($file['tmp_name'], $destination)) {
-                $profilePhoto = $destination;
+            if ($result['success']) {
+                // Delete old photo if exists
+                if (!empty($profilePhoto)) {
+                    deleteFile($profilePhoto);
+                }
+                
+                $profilePhoto = $result['file_path'];
             } else {
-                $this->flash('error', 'Gagal mengupload foto profil.');
+                $this->flash('error', $result['message']);
+                $this->redirect(url('/tenant/profile'));
+                return;
             }
         }
 
@@ -250,8 +230,8 @@ class ProfileController extends Controller
         }
 
         // Delete photo file
-        if ($tenant['profile_photo'] && file_exists($tenant['profile_photo'])) {
-            unlink($tenant['profile_photo']);
+        if (!empty($tenant['profile_photo'])) {
+            deleteFile($tenant['profile_photo']);
         }
 
         // Update database

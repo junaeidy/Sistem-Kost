@@ -129,4 +129,67 @@ class OwnerModel extends Model
         $result = $this->fetchOne($query, ['status' => $status]);
         return (int) $result['total'];
     }
+
+    /**
+     * Get all owners with verification status
+     * 
+     * @param string|null $status Filter by verification status
+     * @return array
+     */
+    public function getAllWithVerificationStatus($status = null)
+    {
+        $query = "
+            SELECT 
+                o.*,
+                u.email,
+                u.status as user_status,
+                u.created_at as registered_at,
+                verified_by_user.email as verified_by_email
+            FROM owners o
+            JOIN users u ON o.user_id = u.id
+            LEFT JOIN users verified_by_user ON o.verified_by = verified_by_user.id
+        ";
+
+        $params = [];
+
+        if ($status) {
+            $query .= " WHERE o.verification_status = :status";
+            $params['status'] = $status;
+        }
+
+        $query .= " ORDER BY 
+            CASE o.verification_status 
+                WHEN 'pending' THEN 1 
+                WHEN 'approved' THEN 2 
+                WHEN 'rejected' THEN 3 
+            END,
+            o.created_at DESC
+        ";
+
+        return $this->fetchAll($query, $params);
+    }
+
+    /**
+     * Get owner with user details (alias for compatibility)
+     * 
+     * @param int $ownerId
+     * @return array|false
+     */
+    public function getWithUser($ownerId)
+    {
+        return $this->getOwnerWithUser($ownerId);
+    }
+
+    /**
+     * Count owners by verification status
+     * 
+     * @param string $status
+     * @return int
+     */
+    public function countByVerificationStatus($status)
+    {
+        $query = "SELECT COUNT(*) as total FROM owners WHERE verification_status = :status";
+        $result = $this->fetchOne($query, ['status' => $status]);
+        return (int) $result['total'];
+    }
 }

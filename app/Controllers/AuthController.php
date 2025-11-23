@@ -348,8 +348,15 @@ class AuthController extends Controller
 
             $this->userModel->commit();
 
+            // Auto-login the newly registered owner
+            Session::set('user_id', $userId);
+            Session::set('user_email', $email);
+            Session::set('user_role', 'owner');
+            Session::set('user_status', 'pending');
+            Session::set('user_name', $name);
+            Session::set('owner_id', $ownerId);
+
             clear_old_input();
-            $this->flash('success', 'Registrasi berhasil! Akun Anda menunggu verifikasi admin.');
             $this->redirect(url('/owner/pending'));
 
         } catch (\Exception $e) {
@@ -371,9 +378,17 @@ class AuthController extends Controller
      */
     public function showPending()
     {
-        // Check if user is actually an owner with pending status
-        if (!Session::isLoggedIn() || !Session::hasRole('owner')) {
+        // Check if user is logged in
+        if (!Session::isLoggedIn()) {
+            $this->flash('error', 'Silakan login terlebih dahulu.');
             $this->redirect(url('/login'));
+            return;
+        }
+
+        // Check if user is owner
+        if (!Session::hasRole('owner')) {
+            $this->flash('error', 'Halaman ini hanya untuk owner.');
+            $this->redirect(url('/'));
             return;
         }
 
@@ -419,12 +434,18 @@ class AuthController extends Controller
             return false;
         }
 
+        // Create upload directory if not exists
+        $uploadDir = dirname(__DIR__, 2) . '/public/uploads/ktp/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $filename = 'ktp_' . time() . '_' . random_string(8) . '.' . $extension;
-        $uploadPath = dirname(__DIR__, 2) . '/public/uploads/ktp/' . $filename;
+        $uploadPath = $uploadDir . $filename;
 
         if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-            return $filename;
+            return $filename; // Return only filename, not full path
         }
 
         return false;

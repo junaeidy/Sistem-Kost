@@ -20,6 +20,9 @@ class KostController extends Controller
     {
         $this->db = Database::getInstance();
         $this->ownerModel = new OwnerModel();
+        
+        // Load upload helper
+        require_once __DIR__ . '/../../../helpers/upload.php';
     }
 
     /**
@@ -388,11 +391,22 @@ class KostController extends Controller
             return;
         }
 
-        // Delete kost (cascade will handle related records)
+        // Get all photos for this kost before deletion
+        $photosQuery = "SELECT photo_url FROM kost_photos WHERE kost_id = :kost_id";
+        $photos = $this->db->fetchAll($photosQuery, ['kost_id' => $id]);
+
+        // Delete physical photo files
+        foreach ($photos as $photo) {
+            if (!empty($photo['photo_url'])) {
+                deleteFile($photo['photo_url']);
+            }
+        }
+
+        // Delete kost (cascade will handle related records including kost_photos in DB)
         $deleted = $this->db->delete('kost', 'id = :id', ['id' => $id]);
 
         if ($deleted) {
-            $this->flash('success', 'Kost berhasil dihapus.');
+            $this->flash('success', 'Kost dan semua foto berhasil dihapus.');
         } else {
             $this->flash('error', 'Gagal menghapus kost.');
         }

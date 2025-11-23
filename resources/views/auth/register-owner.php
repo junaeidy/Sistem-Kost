@@ -78,7 +78,7 @@
                     <!-- Address -->
                     <div class="mb-4">
                         <label class="block text-gray-700 font-semibold mb-2">
-                            <i class="fas fa-map-marker-alt mr-2"></i>Alamat
+                            <i class="fas fa-map-marker-alt mr-2"></i>Alamat<span class="text-red-500">*</span>
                         </label>
                         <textarea name="address" rows="2"
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -88,9 +88,9 @@
                     <!-- KTP Photo -->
                     <div class="mb-4">
                         <label class="block text-gray-700 font-semibold mb-2">
-                            <i class="fas fa-id-card mr-2"></i>Foto KTP (Opsional)
+                            <i class="fas fa-id-card mr-2"></i>Foto KTP <span class="text-red-500">*</span>
                         </label>
-                        <input type="file" name="ktp_photo" accept="image/jpeg,image/jpg,image/png"
+                        <input type="file" required name="ktp_photo" accept="image/jpeg,image/jpg,image/png"
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                         <p class="text-sm text-gray-500 mt-1">Format: JPG, PNG. Maksimal 2MB.</p>
                     </div>

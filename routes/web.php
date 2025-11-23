@@ -76,6 +76,13 @@ $router->middleware(['auth', 'admin'])->get('/admin/profile', 'Admin\ProfileCont
 $router->middleware(['auth', 'admin'])->post('/admin/profile/update', 'Admin\ProfileController@updateProfile');
 $router->middleware(['auth', 'admin'])->post('/admin/profile/update-password', 'Admin\ProfileController@updatePassword');
 
+// KTP Verification Management
+$router->middleware(['auth', 'admin'])->get('/admin/verification', 'Admin\VerificationController@index');
+$router->middleware(['auth', 'admin'])->get('/admin/verification/show/{id}', 'Admin\VerificationController@show');
+$router->middleware(['auth', 'admin'])->post('/admin/verification/approve/{id}', 'Admin\VerificationController@approve');
+$router->middleware(['auth', 'admin'])->post('/admin/verification/reject/{id}', 'Admin\VerificationController@reject');
+$router->middleware(['auth', 'admin'])->post('/admin/verification/reset/{id}', 'Admin\VerificationController@reset');
+
 // ================================================================
 // OWNER ROUTES
 // ================================================================
@@ -98,6 +105,13 @@ $router->middleware(['auth', 'owner'])->post('/owner/kost/{id}/kamar/store', 'Ow
 $router->middleware(['auth', 'owner'])->get('/owner/kamar/{id}/edit', 'Owner\KamarController@edit');
 $router->middleware(['auth', 'owner'])->post('/owner/kamar/{id}/update', 'Owner\KamarController@update');
 $router->middleware(['auth', 'owner'])->post('/owner/kamar/{id}/delete', 'Owner\KamarController@delete');
+
+// Kost Photo Management
+$router->middleware(['auth', 'owner'])->get('/owner/kost/photos/{id}', 'Owner\KostPhotoController@index');
+$router->middleware(['auth', 'owner'])->post('/owner/kost/photos/{id}/upload', 'Owner\KostPhotoController@upload');
+$router->middleware(['auth', 'owner'])->post('/owner/kost/photos/set-primary/{id}', 'Owner\KostPhotoController@setPrimary');
+$router->middleware(['auth', 'owner'])->post('/owner/kost/photos/delete/{id}', 'Owner\KostPhotoController@delete');
+$router->middleware(['auth', 'owner'])->post('/owner/kost/photos/reorder/{id}', 'Owner\KostPhotoController@reorder');
 
 // Booking Management
 $router->middleware(['auth', 'owner'])->get('/owner/bookings', 'Owner\BookingController@index');

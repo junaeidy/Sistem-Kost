@@ -2,12 +2,28 @@
 
 Sistem Informasi Manajemen Kost dengan Fitur Pencarian & Pemesanan di Medan Sunggal.
 
+## 🚦 Status Project
+- **Fase:** 10/10 - UI/UX Polish & Final Testing
+- **Tanggal:** 23 November 2025
+- **Status:** ✅ 100% COMPLETE, Production Ready
+
+---
+
 ## 🌟 Fitur Utama
 
 ### 👥 Multi-Role System
 - **Admin**: Verifikasi owner, monitoring sistem, manajemen global
 - **Owner**: Kelola kost & kamar, terima booking, lihat transaksi
 - **Penyewa**: Cari kost, booking kamar, bayar digital
+
+### 🗺️ GIS (Geographic Information System)
+- Peta interaktif (Leaflet.js, OpenStreetMap)
+- Owner: Map picker untuk set lokasi kost
+- Tenant: Map view & petunjuk arah
+- Clustering & search radius (roadmap)
+- Geocoding alamat otomatis
+- Kalkulasi jarak (Haversine formula)
+- Komponen modular: map-picker, map-view
 
 ### 💳 Payment Gateway
 - Integrasi Midtrans (QRIS, Virtual Account, E-wallet, Credit Card)
@@ -182,7 +198,6 @@ Content-Type: application/json
 ```
 
 ## 🧪 Testing
-
 ### Midtrans Sandbox
 Gunakan test credentials dari Midtrans untuk testing:
 - Credit Card: `4811 1111 1111 1114`
@@ -193,7 +208,6 @@ Gunakan test credentials dari Midtrans untuk testing:
 Lihat file `database/seeders.sql` untuk test accounts
 
 ## 📝 Development Guide
-
 Lihat [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) untuk:
 - Step-by-step development phases
 - Task breakdown
@@ -241,9 +255,11 @@ Untuk pertanyaan dan dukungan:
 - Email: support@sistemkost.com
 
 ## 🔮 Roadmap
-
 - [ ] Email notifications
 - [ ] Review & rating system
 - [ ] Advanced search filters
 - [ ] Multi-language support
 - [ ] Analytics dashboard
+- [ ] Map clustering & search radius (GIS)
+- [ ] Nearby POI & heatmap
+- [ ] Route planning

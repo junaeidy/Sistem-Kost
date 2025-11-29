@@ -54,6 +54,30 @@ $isAuthenticated = isset($_SESSION['user_id']);
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <h1 class="text-3xl font-bold text-gray-800 mb-2"><?= e($kost['name']) ?></h1>
+                            
+                            <!-- Rating Display -->
+                            <?php if (!empty($kost['total_reviews']) && $kost['total_reviews'] > 0): ?>
+                                <div class="flex items-center mb-3">
+                                    <div class="flex items-center">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <?php if ($i <= floor($kost['average_rating'])): ?>
+                                                <i class="fas fa-star text-yellow-400 text-lg"></i>
+                                            <?php elseif ($i - 0.5 <= $kost['average_rating']): ?>
+                                                <i class="fas fa-star-half-alt text-yellow-400 text-lg"></i>
+                                            <?php else: ?>
+                                                <i class="far fa-star text-yellow-400 text-lg"></i>
+                                            <?php endif; ?>
+                                        <?php endfor; ?>
+                                    </div>
+                                    <span class="ml-2 text-gray-700 font-semibold">
+                                        <?= number_format($kost['average_rating'], 1) ?>
+                                    </span>
+                                    <span class="ml-2 text-gray-600">
+                                        (<?= $kost['total_reviews'] ?> review)
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                            
                             <div class="flex items-center text-gray-600">
                                 <i class="fas fa-map-marker-alt mr-2 text-red-500"></i>
                                 <span><?= e($kost['address']) ?></span>
@@ -168,6 +192,9 @@ $isAuthenticated = isset($_SESSION['user_id']);
                         </div>
                     <?php endif; ?>
                 </div>
+
+                <!-- Review Section -->
+                <?php include __DIR__ . '/../components/review-section.php'; ?>
 
             </div>
 

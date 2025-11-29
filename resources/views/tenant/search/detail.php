@@ -49,6 +49,30 @@ $similarKost = $similarKost ?? [];
             <div class="flex items-start justify-between mb-4">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-800 mb-2"><?= e($kost['name']) ?></h1>
+                    
+                    <!-- Rating Display -->
+                    <?php if (!empty($kost['total_reviews']) && $kost['total_reviews'] > 0): ?>
+                        <div class="flex items-center mb-3">
+                            <div class="flex items-center">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <?php if ($i <= floor($kost['average_rating'])): ?>
+                                        <i class="fas fa-star text-yellow-400 text-lg"></i>
+                                    <?php elseif ($i - 0.5 <= $kost['average_rating']): ?>
+                                        <i class="fas fa-star-half-alt text-yellow-400 text-lg"></i>
+                                    <?php else: ?>
+                                        <i class="far fa-star text-yellow-400 text-lg"></i>
+                                    <?php endif; ?>
+                                <?php endfor; ?>
+                            </div>
+                            <span class="ml-2 text-gray-700 font-semibold">
+                                <?= number_format($kost['average_rating'], 1) ?>
+                            </span>
+                            <span class="ml-2 text-gray-600">
+                                (<?= $kost['total_reviews'] ?> review)
+                            </span>
+                        </div>
+                    <?php endif; ?>
+                    
                     <div class="flex items-center text-gray-600">
                         <i class="fas fa-map-marker-alt mr-2 text-red-500"></i>
                         <span><?= e($kost['address']) ?></span>
@@ -99,6 +123,206 @@ $similarKost = $similarKost ?? [];
 
         <!-- Map View Component -->
         <?php include __DIR__ . '/../../components/map-view.php'; ?>
+
+        <!-- Reviews Section -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-star text-yellow-400 mr-2"></i>
+                    Review & Rating
+                </h3>
+                
+                <?php if ($canReview && !$hasReviewed): ?>
+                    <a href="<?= url('/tenant/review/create/' . $kost['id']) ?>" 
+                       class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
+                        <i class="fas fa-pen mr-2"></i>
+                        Tulis Review
+                    </a>
+                <?php endif; ?>
+            </div>
+
+            <!-- Review Statistics -->
+            <?php if ($reviewStats['total_reviews'] > 0): ?>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 pb-6 border-b">
+                    <!-- Average Rating -->
+                    <div class="text-center">
+                        <div class="text-5xl font-bold text-gray-800 mb-2">
+                            <?= number_format($reviewStats['average_rating'], 1) ?>
+                        </div>
+                        <div class="flex justify-center mb-2">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <?php if ($i <= floor($reviewStats['average_rating'])): ?>
+                                    <i class="fas fa-star text-yellow-400 text-xl"></i>
+                                <?php elseif ($i - 0.5 <= $reviewStats['average_rating']): ?>
+                                    <i class="fas fa-star-half-alt text-yellow-400 text-xl"></i>
+                                <?php else: ?>
+                                    <i class="far fa-star text-yellow-400 text-xl"></i>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                        </div>
+                        <p class="text-gray-600">
+                            Dari <?= $reviewStats['total_reviews'] ?> review
+                        </p>
+                    </div>
+
+                    <!-- Rating Distribution -->
+                    <div class="space-y-2">
+                        <?php for ($i = 5; $i >= 1; $i--): ?>
+                            <?php
+                            $starKey = match($i) {
+                                5 => 'five_star',
+                                4 => 'four_star',
+                                3 => 'three_star',
+                                2 => 'two_star',
+                                1 => 'one_star'
+                            };
+                            $count = $reviewStats[$starKey] ?? 0;
+                            $percentage = $reviewStats['total_reviews'] > 0 
+                                ? round(($count / $reviewStats['total_reviews']) * 100) 
+                                : 0;
+                            ?>
+                            <div class="flex items-center text-sm">
+                                <span class="w-12 text-gray-600"><?= $i ?> <i class="fas fa-star text-yellow-400 text-xs"></i></span>
+                                <div class="flex-1 mx-3">
+                                    <div class="bg-gray-200 rounded-full h-2">
+                                        <div class="bg-yellow-400 rounded-full h-2" style="width: <?= $percentage ?>%"></div>
+                                    </div>
+                                </div>
+                                <span class="w-12 text-right text-gray-600"><?= $count ?></span>
+                            </div>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="text-center py-8 mb-6 pb-6 border-b">
+                    <i class="fas fa-star text-gray-300 text-5xl mb-4"></i>
+                    <p class="text-gray-500">Belum ada review untuk kost ini</p>
+                    <?php if ($canReview && !$hasReviewed): ?>
+                        <p class="text-gray-400 text-sm mt-2">Jadilah yang pertama memberikan review!</p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- User's Review (if exists) -->
+            <?php if ($hasReviewed && $userReview): ?>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-center">
+                            <i class="fas fa-user-circle text-blue-600 text-2xl mr-2"></i>
+                            <div>
+                                <p class="font-semibold text-blue-800">Review Anda</p>
+                                <div class="flex items-center mt-1">
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <i class="<?= $i <= $userReview['rating'] ? 'fas' : 'far' ?> fa-star text-yellow-400 text-sm"></i>
+                                    <?php endfor; ?>
+                                    <span class="ml-2 text-xs text-gray-600">
+                                        <?= date('d M Y', strtotime($userReview['created_at'])) ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="<?= url('/tenant/review/edit/' . $userReview['id']) ?>" 
+                               class="text-blue-600 hover:text-blue-700 text-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="<?= url('/tenant/review/delete/' . $userReview['id']) ?>" 
+                                  method="POST" 
+                                  class="inline"
+                                  onsubmit="return confirm('Yakin ingin menghapus review Anda?')">
+                                <button type="submit" class="text-red-600 hover:text-red-700 text-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <?php if (!empty($userReview['review_text'])): ?>
+                        <p class="text-gray-700 mt-2"><?= nl2br(htmlspecialchars($userReview['review_text'])) ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Reviews List -->
+            <?php if (!empty($reviews)): ?>
+                <div class="space-y-4">
+                    <h4 class="font-semibold text-gray-800 mb-3">Review dari Penyewa</h4>
+                    
+                    <?php foreach ($reviews as $review): ?>
+                        <?php if ($hasReviewed && $review['id'] == $userReview['id']) continue; ?>
+                        
+                        <div class="border-b border-gray-200 pb-4 last:border-0">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <?php if (!empty($review['profile_photo'])): ?>
+                                        <img src="<?= url('/uploads/profile/' . htmlspecialchars($review['profile_photo'])) ?>" 
+                                             alt="<?= htmlspecialchars($review['tenant_name']) ?>" 
+                                             class="w-10 h-10 rounded-full object-cover">
+                                    <?php else: ?>
+                                        <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                            <i class="fas fa-user text-gray-600"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <div class="ml-3 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="font-semibold text-gray-800"><?= htmlspecialchars($review['tenant_name']) ?></p>
+                                            <div class="flex items-center mt-1">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                    <i class="<?= $i <= $review['rating'] ? 'fas' : 'far' ?> fa-star text-yellow-400 text-sm"></i>
+                                                <?php endfor; ?>
+                                                <span class="ml-2 text-xs text-gray-500">
+                                                    <?= date('d M Y', strtotime($review['created_at'])) ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <?php if (!empty($review['review_text'])): ?>
+                                        <p class="text-gray-700 mt-2"><?= nl2br(htmlspecialchars($review['review_text'])) ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Review Pagination -->
+                <?php if ($reviewPagination['total_pages'] > 1): ?>
+                    <div class="mt-6 pt-4 border-t">
+                        <div class="flex justify-center items-center space-x-2">
+                            <?php if ($reviewPagination['current_page'] > 1): ?>
+                                <a href="<?= url('/tenant/search/' . $kost['id'] . '?review_page=' . ($reviewPagination['current_page'] - 1)) ?>#reviews" 
+                                   class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            <?php endif; ?>
+
+                            <?php for ($i = 1; $i <= $reviewPagination['total_pages']; $i++): ?>
+                                <?php if ($i == $reviewPagination['current_page']): ?>
+                                    <span class="px-3 py-1 bg-blue-600 text-white rounded"><?= $i ?></span>
+                                <?php else: ?>
+                                    <a href="<?= url('/tenant/search/' . $kost['id'] . '?review_page=' . $i) ?>#reviews" 
+                                       class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                                        <?= $i ?>
+                                    </a>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+
+                            <?php if ($reviewPagination['current_page'] < $reviewPagination['total_pages']): ?>
+                                <a href="<?= url('/tenant/search/' . $kost['id'] . '?review_page=' . ($reviewPagination['current_page'] + 1)) ?>#reviews" 
+                                   class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php elseif ($reviewStats['total_reviews'] == 0): ?>
+                <!-- Already shown above -->
+            <?php endif; ?>
+        </div>
 
         <!-- Available Rooms -->
         <div class="bg-white rounded-lg shadow-md p-6">

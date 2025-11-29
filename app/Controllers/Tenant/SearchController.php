@@ -6,6 +6,7 @@ use Core\Controller;
 use Core\Session;
 use App\Models\TenantModel;
 use App\Models\KostModel;
+use App\Models\ReviewModel;
 
 /**
  * Tenant Search Controller
@@ -15,11 +16,13 @@ class SearchController extends Controller
 {
     private $tenantModel;
     private $kostModel;
+    private $reviewModel;
 
     public function __construct()
     {
         $this->tenantModel = new TenantModel();
         $this->kostModel = new KostModel();
+        $this->reviewModel = new ReviewModel();
     }
 
     /**
@@ -151,12 +154,43 @@ class SearchController extends Controller
         // Limit to 4 similar kost
         $similarKost = array_slice($similarKost, 0, 4);
 
+        // Get review statistics
+        $reviewStats = $this->reviewModel->getKostStats($id);
+
+        // Get reviews with pagination
+        $perPage = 5;
+        $page = max(1, (int) ($_GET['review_page'] ?? 1));
+        $offset = ($page - 1) * $perPage;
+        $reviews = $this->reviewModel->findByKostId($id, $perPage, $offset);
+        $totalReviews = $reviewStats['total_reviews'];
+        $totalPages = $totalReviews > 0 ? (int) ceil($totalReviews / $perPage) : 1;
+
+        // Check if current tenant can review
+        $tenantId = $tenant['id'];
+        $canReview = $this->reviewModel->canTenantReview($tenantId, $id);
+        $hasReviewed = $this->reviewModel->hasReviewed($tenantId, $id);
+        $userReview = null;
+        if ($hasReviewed) {
+            $userReview = $this->reviewModel->getByTenantAndKost($tenantId, $id);
+        }
+
         $this->view('tenant/search/detail', [
             'title' => $kost['name'],
             'pageTitle' => $kost['name'],
             'tenant' => $tenant,
             'kost' => $kost,
-            'similarKost' => $similarKost
+            'similarKost' => $similarKost,
+            'reviewStats' => $reviewStats,
+            'reviews' => $reviews,
+            'canReview' => $canReview,
+            'hasReviewed' => $hasReviewed,
+            'userReview' => $userReview,
+            'reviewPagination' => [
+                'current_page' => $page,
+                'total_pages' => $totalPages,
+                'total_items' => $totalReviews,
+                'per_page' => $perPage
+            ]
         ], 'layouts/dashboard');
     }
 }

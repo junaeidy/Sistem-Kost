@@ -52,7 +52,9 @@ class KostModel extends Model
                 (SELECT COUNT(*) FROM kamar WHERE kost_id = k.id) as total_rooms,
                 (SELECT COUNT(*) FROM kamar WHERE kost_id = k.id AND status = 'available') as available_rooms,
                 (SELECT MIN(price) FROM kamar WHERE kost_id = k.id) as min_price,
-                (SELECT photo_url FROM kost_photos WHERE kost_id = k.id AND is_primary = 1 LIMIT 1) as primary_photo
+                (SELECT photo_url FROM kost_photos WHERE kost_id = k.id AND is_primary = 1 LIMIT 1) as primary_photo,
+                (SELECT COUNT(*) FROM reviews WHERE kost_id = k.id) as total_reviews,
+                (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE kost_id = k.id) as average_rating
             FROM {$this->table} k
             INNER JOIN owners o ON k.owner_id = o.id
             WHERE k.status = 'active'
@@ -145,7 +147,9 @@ class KostModel extends Model
                 o.phone as owner_phone,
                 o.address as owner_address,
                 (SELECT COUNT(*) FROM kamar WHERE kost_id = k.id) as total_kamar,
-                (SELECT COUNT(*) FROM kamar WHERE kost_id = k.id AND status = 'available') as available_kamar
+                (SELECT COUNT(*) FROM kamar WHERE kost_id = k.id AND status = 'available') as available_kamar,
+                (SELECT COUNT(*) FROM reviews WHERE kost_id = k.id) as total_reviews,
+                (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE kost_id = k.id) as average_rating
             FROM {$this->table} k
             INNER JOIN owners o ON k.owner_id = o.id
             WHERE k.id = :id
@@ -155,6 +159,10 @@ class KostModel extends Model
         $kost = $this->fetchOne($query, ['id' => $id]);
 
         if ($kost) {
+            // Format rating
+            $kost['average_rating'] = round((float) $kost['average_rating'], 1);
+            $kost['total_reviews'] = (int) $kost['total_reviews'];
+
             // Get photos
             $photosQuery = "SELECT * FROM kost_photos WHERE kost_id = :kost_id ORDER BY is_primary DESC, display_order ASC";
             $kost['photos'] = $this->fetchAll($photosQuery, ['kost_id' => $id]);

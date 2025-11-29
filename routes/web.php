@@ -156,6 +156,13 @@ $router->middleware(['auth', 'tenant'])->post('/tenant/profile/update', 'Tenant\
 $router->middleware(['auth', 'tenant'])->post('/tenant/profile/update-password', 'Tenant\ProfileController@updatePassword');
 $router->middleware(['auth', 'tenant'])->post('/tenant/profile/delete-photo', 'Tenant\ProfileController@deletePhoto');
 
+// Review Management
+$router->middleware(['auth', 'tenant'])->get('/tenant/review/create/{kostId}', 'Tenant\ReviewController@create');
+$router->middleware(['auth', 'tenant'])->post('/tenant/review/store/{kostId}', 'Tenant\ReviewController@store');
+$router->middleware(['auth', 'tenant'])->get('/tenant/review/edit/{id}', 'Tenant\ReviewController@edit');
+$router->middleware(['auth', 'tenant'])->post('/tenant/review/update/{id}', 'Tenant\ReviewController@update');
+$router->middleware(['auth', 'tenant'])->post('/tenant/review/delete/{id}', 'Tenant\ReviewController@delete');
+
 // ================================================================
 // PAYMENT ROUTES (Midtrans Integration)
 // ================================================================

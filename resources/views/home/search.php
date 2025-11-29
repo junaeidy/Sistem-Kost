@@ -179,6 +179,23 @@ $isSearching = $isSearching ?? false;
                             <span class="line-clamp-2"><?= e($kost['location']) ?></span>
                         </p>
                         
+                        <!-- Rating -->
+                        <?php if (!empty($kost['total_reviews']) && $kost['total_reviews'] > 0): ?>
+                            <div class="flex items-center mb-3">
+                                <div class="flex items-center">
+                                    <?php 
+                                    $avgRating = round((float) ($kost['average_rating'] ?? 0), 1);
+                                    for ($i = 1; $i <= 5; $i++): 
+                                    ?>
+                                        <i class="<?= $i <= floor($avgRating) ? 'fas' : ($i - 0.5 <= $avgRating ? 'fas fa-star-half-alt' : 'far') ?> fa-star text-yellow-400 text-xs"></i>
+                                    <?php endfor; ?>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">
+                                    <?= $avgRating ?> (<?= $kost['total_reviews'] ?> review)
+                                </span>
+                            </div>
+                        <?php endif; ?>
+                        
                         <!-- Price Range -->
                         <div class="mb-4">
                             <?php if (!empty($kost['min_price']) && $kost['min_price'] > 0): ?>

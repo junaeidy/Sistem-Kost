@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use Core\Controller;
 use App\Models\KostModel;
+use App\Models\ReviewModel;
 
 /**
  * Home Controller
@@ -12,10 +13,12 @@ use App\Models\KostModel;
 class HomeController extends Controller
 {
     private $kostModel;
+    private $reviewModel;
 
     public function __construct()
     {
         $this->kostModel = new KostModel();
+        $this->reviewModel = new ReviewModel();
     }
 
     /**
@@ -145,10 +148,29 @@ class HomeController extends Controller
         // Limit to 4 similar kost
         $similarKost = array_slice($similarKost, 0, 4);
 
+        // Get review statistics
+        $reviewStats = $this->reviewModel->getKostStats($id);
+
+        // Get reviews with pagination
+        $perPage = 5;
+        $page = max(1, (int) ($_GET['review_page'] ?? 1));
+        $offset = ($page - 1) * $perPage;
+        $reviews = $this->reviewModel->findByKostId($id, $perPage, $offset);
+        $totalReviews = $reviewStats['total_reviews'];
+        $totalPages = $totalReviews > 0 ? (int) ceil($totalReviews / $perPage) : 1;
+
         $this->view('home/detail', [
             'title' => $kost['name'],
             'kost' => $kost,
-            'similarKost' => $similarKost
+            'similarKost' => $similarKost,
+            'reviewStats' => $reviewStats,
+            'reviews' => $reviews,
+            'reviewPagination' => [
+                'current_page' => $page,
+                'total_pages' => $totalPages,
+                'total_items' => $totalReviews,
+                'per_page' => $perPage
+            ]
         ]);
     }
 }

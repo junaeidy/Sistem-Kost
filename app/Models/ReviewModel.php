@@ -287,4 +287,36 @@ class ReviewModel extends Model
 
         return $this->fetchOne($query, ['id' => $id]);
     }
+
+    /**
+     * Get latest reviews from different kost
+     * Each review from a different kost
+     * 
+     * @param int $limit
+     * @return array
+     */
+    public function getLatestReviewsFromDifferentKost($limit = 3)
+    {
+        $query = "
+            SELECT 
+                r.*,
+                t.name as tenant_name,
+                t.profile_photo,
+                k.name as kost_name,
+                k.address as kost_address
+            FROM {$this->table} r
+            INNER JOIN tenants t ON r.tenant_id = t.id
+            INNER JOIN kost k ON r.kost_id = k.id
+            INNER JOIN (
+                SELECT kost_id, MAX(created_at) as max_created_at
+                FROM {$this->table}
+                GROUP BY kost_id
+                ORDER BY max_created_at DESC
+                LIMIT :limit
+            ) latest ON r.kost_id = latest.kost_id AND r.created_at = latest.max_created_at
+            ORDER BY r.created_at DESC
+        ";
+
+        return $this->fetchAll($query, ['limit' => $limit]);
+    }
 }

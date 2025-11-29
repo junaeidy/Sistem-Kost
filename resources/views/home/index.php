@@ -298,74 +298,124 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <!-- Testimonial 1 -->
-                <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-2xl transition">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                            AR
+                <?php if (!empty($latestReviews)): ?>
+                    <?php 
+                    $colors = ['blue', 'pink', 'purple', 'indigo', 'green', 'red'];
+                    $colorIndex = 0;
+                    foreach ($latestReviews as $review): 
+                        $color = $colors[$colorIndex % count($colors)];
+                        $colorIndex++;
+                        
+                        // Get initials from tenant name
+                        $nameParts = explode(' ', $review['tenant_name']);
+                        $initials = '';
+                        foreach ($nameParts as $part) {
+                            $initials .= strtoupper(substr($part, 0, 1));
+                        }
+                        if (strlen($initials) > 2) {
+                            $initials = substr($initials, 0, 2);
+                        }
+                    ?>
+                    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-2xl transition">
+                        <div class="flex items-center mb-4">
+                            <?php if (!empty($review['profile_photo'])): ?>
+                                <img src="<?= BASE_URL ?>/uploads/profile/<?= htmlspecialchars($review['profile_photo']) ?>" 
+                                     alt="<?= htmlspecialchars($review['tenant_name']) ?>"
+                                     class="w-12 h-12 rounded-full object-cover mr-3">
+                            <?php else: ?>
+                                <div class="w-12 h-12 bg-<?= $color ?>-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                                    <?= $initials ?>
+                                </div>
+                            <?php endif; ?>
+                            <div>
+                                <h4 class="font-semibold text-gray-800"><?= htmlspecialchars($review['tenant_name']) ?></h4>
+                                <p class="text-sm text-gray-500">Penyewa Kost</p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-800">Ahmad Rizki</h4>
-                            <p class="text-sm text-gray-500">Penyewa Kost</p>
+                        <div class="flex mb-3">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <i class="fas fa-star <?= $i <= $review['rating'] ? 'text-yellow-400' : 'text-gray-300' ?>"></i>
+                            <?php endfor; ?>
                         </div>
-                    </div>
-                    <div class="flex mb-3">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                    </div>
-                    <p class="text-gray-600 italic">
-                        "Sangat membantu dalam mencari kost yang sesuai budget. Proses pembayaran juga mudah dan aman!"
-                    </p>
-                </div>
-                
-                <!-- Testimonial 2 -->
-                <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-2xl transition">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-pink-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                            SP
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-800">Siti Permata</h4>
-                            <p class="text-sm text-gray-500">Penyewa Kost</p>
-                        </div>
-                    </div>
-                    <div class="flex mb-3">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                    </div>
-                    <p class="text-gray-600 italic">
-                        "Platform yang sangat user-friendly. Saya bisa filter kost sesuai kebutuhan dengan mudah. Recommended!"
-                    </p>
-                </div>
-                
-                <!-- Testimonial 3 -->
-                <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-2xl transition">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                            BW
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-800">Budi Wijaya</h4>
-                            <p class="text-sm text-gray-500">Pemilik Kost</p>
+                        <?php if (!empty($review['review_text'])): ?>
+                            <p class="text-gray-600 italic mb-3">
+                                "<?= htmlspecialchars($review['review_text']) ?>"
+                            </p>
+                        <?php endif; ?>
+                        <div class="text-sm text-gray-500 mt-4 pt-4 border-t border-gray-100">
+                            <i class="fas fa-home mr-1"></i>
+                            <?= htmlspecialchars($review['kost_name']) ?>
                         </div>
                     </div>
-                    <div class="flex mb-3">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <i class="fas fa-star text-yellow-400"></i>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <!-- Default testimonials if no reviews yet -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-2xl transition">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                                AR
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Ahmad Rizki</h4>
+                                <p class="text-sm text-gray-500">Penyewa Kost</p>
+                            </div>
+                        </div>
+                        <div class="flex mb-3">
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                        </div>
+                        <p class="text-gray-600 italic">
+                            "Sangat membantu dalam mencari kost yang sesuai budget. Proses pembayaran juga mudah dan aman!"
+                        </p>
                     </div>
-                    <p class="text-gray-600 italic">
-                        "Memudahkan saya mengelola kost. Dashboard yang lengkap dan sistem pembayaran yang terintegrasi!"
-                    </p>
-                </div>
+                    
+                    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-2xl transition">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-pink-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                                SP
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Siti Permata</h4>
+                                <p class="text-sm text-gray-500">Penyewa Kost</p>
+                            </div>
+                        </div>
+                        <div class="flex mb-3">
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                        </div>
+                        <p class="text-gray-600 italic">
+                            "Platform yang sangat user-friendly. Saya bisa filter kost sesuai kebutuhan dengan mudah. Recommended!"
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-2xl transition">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                                BW
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Budi Wijaya</h4>
+                                <p class="text-sm text-gray-500">Pemilik Kost</p>
+                            </div>
+                        </div>
+                        <div class="flex mb-3">
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                        </div>
+                        <p class="text-gray-600 italic">
+                            "Memudahkan saya mengelola kost. Dashboard yang lengkap dan sistem pembayaran yang terintegrasi!"
+                        </p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </section>

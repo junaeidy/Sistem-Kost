@@ -35,9 +35,13 @@ class HomeController extends Controller
         
         $featuredKost = array_slice($featuredKost, 0, 6);
 
+        // Get latest reviews from different kost (3 latest)
+        $latestReviews = $this->reviewModel->getLatestReviewsFromDifferentKost(3);
+
         $this->view('home/index', [
             'title' => 'Beranda',
-            'featuredKost' => $featuredKost
+            'featuredKost' => $featuredKost,
+            'latestReviews' => $latestReviews
         ]);
     }
 

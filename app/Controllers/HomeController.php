@@ -74,19 +74,12 @@ class HomeController extends Controller
             'available_only' => isset($_GET['available_only']) ? true : false
         ];
 
-        // Search kost
-        $kostList = [];
-        $isSearching = false;
-
-        // If any filter is applied, perform search
-        if (!empty($filters['q']) || !empty($filters['location']) || !empty($filters['gender']) || 
-            !empty($filters['price']) || !empty($filters['facilities'])) {
-            $isSearching = true;
-            $kostList = $this->kostModel->search($filters);
-        } else {
-            // Show all active kost by default
-            $kostList = $this->kostModel->search(['available_only' => true]);
-        }
+        // Search kost - always show all active kost
+        $isSearching = !empty($filters['q']) || !empty($filters['location']) || !empty($filters['gender']) || 
+                       !empty($filters['price']) || !empty($filters['facilities']);
+        
+        // Always perform search with filters (will return all active kost if no filters)
+        $kostList = $this->kostModel->search($filters);
 
         $this->view('home/search', [
             'title' => 'Cari Kost',

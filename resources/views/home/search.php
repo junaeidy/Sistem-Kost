@@ -194,6 +194,13 @@ $isSearching = $isSearching ?? false;
                                     <?= $avgRating ?> (<?= $kost['total_reviews'] ?> review)
                                 </span>
                             </div>
+                        <?php else: ?>
+                            <div class="flex items-center mb-3">
+                                <i class="far fa-star text-gray-300 text-xs"></i>
+                                <span class="ml-2 text-sm text-gray-400 italic">
+                                    Belum ada review
+                                </span>
+                            </div>
                         <?php endif; ?>
                         
                         <!-- Price Range -->
